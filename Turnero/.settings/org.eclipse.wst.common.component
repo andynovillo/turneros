@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="Turnero">
+        <wb-resource deploy-path="/" source-path="/EarContent" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/" source-path="/EarContent/lib"/>
+        <dependent-module archiveName="TurneroWeb.war" deploy-path="/" handle="module:/resource/TurneroWeb/TurneroWeb">
+            <dependent-object/>
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="TurneroEJB.jar" deploy-path="/" handle="module:/resource/TurneroEJB/TurneroEJB">
+            <dependent-object/>
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+    </wb-module>
+</project-modules>

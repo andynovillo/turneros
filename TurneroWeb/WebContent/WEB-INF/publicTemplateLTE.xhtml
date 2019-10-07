@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html lang="es" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui" xmlns:jsf="http://xmlns.jcp.org/jsf"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" mozNoMarginBoxes="true">
+<h:head id="head">
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport" />
+	<meta name="description" content="HTMC" />
+	<meta name="author" content="BryanV" />
+	<title>HTMC</title>
+	<link rel="shortcut icon" href="#{resource['images/favicon.ico']}" type="image/x-icon" />
+</h:head>
+<h:body id="body" styleClass="no-margin">
+	<f:facet name="last">
+		<h:outputStylesheet name="css/bootstrap.css" />
+		<h:outputStylesheet name="css/AdminLTE.css" />
+		<h:outputStylesheet name="css/skin-blue.css" />
+		<h:outputStylesheet name="css/CustomAdminLTE.css" />
+		<h:outputStylesheet name="css/HTMC.css" />
+		<h:outputStylesheet name="css/color.css" />
+	</f:facet>
+	<ui:insert name="content-without-wrapper">
+	</ui:insert>
+	<div id="wrapper" class="margin-bottom">
+		<div id="page-wrapper">
+			<div class="container-fluid">
+				<section class="content-header">
+					<ui:insert name="heading">
+						<!-- Page Heading -->
+						<ui:include src="/WEB-INF/heading.xhtml"></ui:include>
+					</ui:insert>
+				</section>
+				<section>
+					<ui:insert name="content">
+					</ui:insert>
+				</section>
+			</div>
+			<!-- /.container-fluid -->
+		</div>
+		<!-- /#page-wrapper -->
+	</div>
+	<!-- /#wrapper -->
+	<p:ajaxStatus id="ajaxStatus" onstart="$('#ajax-status-dlg').modal('show')"
+		onsuccess="$('#ajax-status-dlg').modal('hide')"
+		onerror="$('#ajax-status-dlg').modal('hide');$('#error-status-dlg').modal('show')" />
+	<div id="ajax-status-dlg" class="modal" data-backdrop="static" data-keyboard="false">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-body">
+					<div class="text-center">
+						<p:graphicImage id="loading-img" name="/images/loading.gif" />
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="error-status-dlg" class="modal" data-backdrop="static" data-keyboard="false">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<div class="text-center">
+						<p>¡Ha ocurrido un incidente, lamentamos los inconvenientes!</p>
+						<div class="text-center">
+							<button class="btn btn-primary" onclick="$('#error-status-dlg').modal('hide');">Ok</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- CSS -->
+	<ui:insert name="css">
+	</ui:insert>
+	<!-- jQuery -->
+	<h:outputScript name="js/jquery.js" rendered="false" />
+	<!-- Bootstrap Core JavaScript -->
+	<h:outputScript name="js/bootstrap.js" rendered="true" />
+	<h:outputScript name="js/mp-modernizr.custom.js" rendered="false" />
+	<h:outputScript name="js/classie.js" rendered="false" />
+	<h:outputScript name="js/mlpushmenu.js" rendered="false" />
+	<h:outputScript name="js/rm-modernizr.custom.js" rendered="true" />
+	<h:outputScript name="js/jquery.dlmenu.js" rendered="true" />
+	<!-- Utilities -->
+	<h:outputScript name="js/utility.js" rendered="true" />
+	<script>
+	
+		$ = jQuery;
+		
+		var wrongBrowser = '#{strings["wrongBrowser"]}'; 		
+		var startup = '#{startup.time}';	
+		var menuItems = new Object(#{menuInSession});
+		var contextPath  = '#{request.contextPath}';
+		var sessionCreated = '#{not empty userInSession}';		
+
+	</script>
+	<ui:insert name="js"></ui:insert>
+</h:body>
+</html>

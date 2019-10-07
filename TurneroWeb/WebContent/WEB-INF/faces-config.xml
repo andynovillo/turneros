@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faces-config xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_3.xsd"
+	version="2.3">
+
+	<application>
+		<message-bundle>web.utility.CustomMessages</message-bundle>
+		<resource-bundle>
+			<base-name>web.utility.Strings</base-name>
+			<var>strings</var>
+		</resource-bundle>
+	</application>
+
+	<application>
+		<resource-handler>handler.CustomResourceHandler</resource-handler>
+	</application>
+
+	<managed-bean>
+		<managed-bean-name>currentDate</managed-bean-name>
+		<managed-bean-class>java.util.Date</managed-bean-class>
+		<managed-bean-scope>request</managed-bean-scope>
+	</managed-bean>
+
+
+	<factory>
+		<exception-handler-factory>handler.DefaultExceptionHandlerFactory</exception-handler-factory>
+	</factory>
+
+
+	<lifecycle>
+		<phase-listener>handler.LifeCycleListener</phase-listener>
+	</lifecycle>
+
+
+</faces-config>

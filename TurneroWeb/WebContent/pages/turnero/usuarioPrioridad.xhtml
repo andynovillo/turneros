@@ -1,0 +1,112 @@
+<ui:composition template="/WEB-INF/templateLTE.xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+	<ui:define name="content">
+		<div class="row">
+			<div class="col-lg-12">
+				<h:form id="form">
+					<p:growl id="growl" />
+					<div class="col-lg-6 margin-bottom">
+						<p:dataTable id="user-tbl" var="object"
+							styleClass="table-compacted"
+							value="#{systemUserServiceTypePriorityBean.systemUserList}"
+							paginator="true" paginatorPosition="bottom"
+							paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+							widgetVar="user-tbl" rows="5"
+							emptyMessage="#{strings['emptyMessage']}" pageLinks="3">
+							<f:facet name="header">Usuarios</f:facet>
+							<p:ajax event="filter" global="false" />
+							<p:ajax event="sort" global="false" />
+							<p:ajax event="page" global="false" />
+							<p:column filterBy="#{object.codSystemUser}" styleClass="ms-col"
+								filterMatchMode="contains" headerText="Usuario">
+								<div class="ellipsis">#{object.codSystemUser}</div>
+							</p:column>
+							<p:column filterBy="#{object.nombresCompletos}"
+								styleClass="full-col" filterMatchMode="contains"
+								headerText="Nombres">
+								<div class="ellipsis">#{object.nombresCompletos}</div>
+							</p:column>
+							<p:column styleClass="btn-col text-center">
+								<p:commandLink styleClass="btn btn-xs btn-primary white-text"
+									action="#{systemUserServiceTypePriorityBean.fetchServiceTypePriorityByUser(object)}"
+									process="@this" update="@form" oncomplete="initPage()">
+									<i class="fa fa-fw fa-arrow-right" />
+								</p:commandLink>
+							</p:column>
+						</p:dataTable>
+					</div>
+					<div class="col-lg-6">
+						<p:outputPanel id="panel" styleClass="panel panel-default">
+							<div class="panel-heading">Prioridades</div>
+							<div class="panel-body">
+								<div class="text-center margin-bottom">
+									Usuario<br />
+									<h:outputText
+										value="#{systemUserServiceTypePriorityBean.systemUser.codSystemUser}"
+										rendered="#{systemUserServiceTypePriorityBean.systemUserSelected}" />
+									<br />
+								</div>
+								<div class="margin-bottom">
+									<p:selectCheckboxMenu id="dependency-list" rendered="false"
+										value="#{systemUserServiceTypePriorityBean.serviceTypePrioritySelectedList}"
+										label="Escoja una opción" filter="true"
+										filterMatchMode="contains" styleClass="form-control"
+										converter="omnifaces.SelectItemsConverter">
+										<f:selectItems
+											value="#{systemUserServiceTypePriorityBean.serviceTypePriorityList}"
+											var="object" itemLabel="#{object.label}"
+											itemValue="#{object}" />
+									</p:selectCheckboxMenu>
+									<h:selectManyListbox id="diet-array"
+										styleClass="selectpicker form-control" pt:multiple="multiple"
+										pt:data-live-search="true" pt:data-actions-box="true"
+										pt:data-live-search-normalize="true"
+										pt:data-selected-text-format="count"
+										value="#{systemUserServiceTypePriorityBean.serviceTypePrioritySelectedList}"
+										converter="omnifaces.SelectItemsConverter">
+										<f:selectItems
+											value="#{systemUserServiceTypePriorityBean.serviceTypePriorityList}"
+											var="object" itemLabel="#{object.label}"
+											itemValue="#{object}" />
+									</h:selectManyListbox>
+								</div>
+								<div class="text-center">
+									<p:commandLink id="save-btn" process="@form" update="@form"
+										styleClass="btn btn-primary"
+										action="#{systemUserServiceTypePriorityBean.save()}"
+										oncomplete="initPage()">
+										<i class="fa fa-fw fa-save" /> Guardar
+									</p:commandLink>
+								</div>
+							</div>
+						</p:outputPanel>
+					</div>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+	<ui:define name="css">
+		<h:outputStylesheet name="css/bootstrap-select.min.css"
+			rendered="true" />
+	</ui:define>
+	<ui:define name="js">
+		<h:outputScript name="js/bootstrap-select.min.js" rendered="true" />
+		<h:outputScript name="js/bootstrap-select-es.min.js" rendered="true" />
+		<script>
+			$(function() {
+
+				initPage();
+
+			});
+
+			function initPage() {
+				$('.selectpicker').selectpicker();
+			}
+		</script>
+	</ui:define>
+</ui:composition>

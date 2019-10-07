@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1"
+	xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+
+	<persistence-unit name="EntityGeneratorPU"
+		transaction-type="JTA">
+		<jta-data-source>Turnero</jta-data-source>
+		<class>entity.auth.Option</class>
+		<class>entity.auth.Role</class>
+		<class>entity.auth.SystemUser</class>
+		<class>entity.poll.RelativeType</class>
+		<class>entity.poll.Respondent</class>
+		<class>entity.pub.Parameter</class>
+		<class>entity.surgery.Patient</class>
+		<class>entity.ticket.Area</class>
+		<class>entity.ticket.AttentionModule</class>
+		<class>entity.ticket.Monitor</class>
+		<class>entity.ticket.ServiceType</class>
+		<class>entity.ticket.SystemUserServiceType</class>
+		<class>entity.ticket.SystemUserServiceTypePK</class>
+		<class>entity.ticket.SystemUserTicket</class>
+		<class>entity.ticket.Ticket</class>
+		<class>entity.ticket.TicketHeader</class>
+		<class>entity.ticket.TicketPriority</class>
+		<class>entity.ticket.TicketService</class>
+
+	</persistence-unit>
+
+</persistence>

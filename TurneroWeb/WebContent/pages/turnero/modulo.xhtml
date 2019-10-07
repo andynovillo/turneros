@@ -1,0 +1,115 @@
+<ui:composition template="/WEB-INF/templateLTE.xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:jsf="http://xmlns.jcp.org/jsf">
+	<ui:define name="content">
+		<div class="row">
+			<div class="col-lg-12">
+				<h:form id="form" styleClass="form-horizontal">
+					<p:focus id="focus" context="panel" />
+					<p:growl id="growl" />
+					<p:outputPanel id="panel"
+						styleClass="panel panel-default margin-bottom">
+						<div class="panel-heading">Administración de módulos de
+							atención</div>
+						<div class="panel-body">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Etiqueta</label>
+								<div class="col-sm-4">
+									<p:inputText id="label-in" label="Etiqueta"
+										styleClass="form-control"
+										value="#{attentionModuleBean.object.label}" required="true" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Descripción</label>
+								<div class="col-sm-4">
+									<p:inputText id="description-in" label="Descripción"
+										styleClass="form-control"
+										value="#{attentionModuleBean.object.description}"
+										required="false" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Estado</label>
+								<div class="col-sm-2">
+									<div class="checkbox checkbox-info checkbox-circle">
+										<input jsf:id="status-in" type="checkbox"
+											onclick="$(this).val(this.checked ? true : false);"
+											value="#{attentionModuleBean.object.status}" />
+										<h:outputLabel for="status-in">
+											<h:outputText value="&#160;" />
+										</h:outputLabel>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="panel-footer">
+							<div class="pull-right">
+								<a jsf:id="reset-btn" type="submit"
+									jsf:action="#{attentionModuleBean.resetForm()}"
+									class="btn btn-danger"> <span class="fa fa-close"></span>
+									Cancelar<p:ajax process="@this" update="@form" />
+								</a> <a jsf:id="save-btn" type="submit"
+									jsf:action="#{attentionModuleBean.saveObject()}"
+									class="btn btn-primary"> <span class="fa fa-check"></span>
+									Guardar<p:ajax process="panel" update="@form" />
+								</a>
+							</div>
+							<div class="clearfix"></div>
+						</div>
+					</p:outputPanel>
+					<p:dataTable id="tbl" widgetVar="tbl" var="record"
+						styleClass="table-compacted margin-bottom"
+						value="#{attentionModuleBean.objectList}" paginator="true"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						currentPageReportTemplate="Total: {totalRecords}"
+						paginatorPosition="bottom" rowsPerPageTemplate="5,10,15" rows="5"
+						pageLinks="3" emptyMessage="#{strings['emptyMessage']}">
+						<f:facet name="header">Módulos de atención</f:facet>
+						<p:ajax event="filter" global="false" />
+						<p:ajax event="sort" global="false" />
+						<p:ajax event="page" global="false" />
+						<p:column id="label-col" filterBy="#{record.label}"
+							sortBy="#{record.label}" styleClass="full-col"
+							filterMatchMode="contains" headerText="Etiqueta">
+							<h:outputText value="#{record.label}" />
+						</p:column>
+						<p:column id="description-col" filterBy="#{record.description}"
+							sortBy="#{record.description}" styleClass="m-col"
+							filterMatchMode="contains" headerText="Descripción">
+							<div class="ellipsis">
+								<h:outputText value="#{record.description}" />
+							</div>
+						</p:column>
+						<p:column id="status-col" styleClass="m-col" headerText="Estado"
+							filterBy="#{record.status}" filterMatchMode="exact">
+							<f:facet name="filter">
+								<h:selectOneMenu id="sts-slct" onchange="PF('tbl').filter()">
+									<f:selectItem itemLabel="Seleccione el estado"
+										itemValue="#{null}" noSelectionOption="true" />
+									<f:selectItem itemLabel="Activo" itemValue="true" />
+									<f:selectItem itemLabel="No activo" itemValue="false" />
+								</h:selectOneMenu>
+							</f:facet>
+							<h:outputText value="#{record.status ? 'Activo':'No activo'}" />
+						</p:column>
+						<p:column styleClass="xs-btn-col text-center">
+							<p:commandLink id="editButton" update=":form:panel :form:growl"
+								action="#{attentionModuleBean.selectObject(record)}"
+								process="@this" styleClass="btn btn-xs btn-primary white-text">
+								<span class="fa fa-fw fa-pencil"></span>
+							</p:commandLink>
+						</p:column>
+					</p:dataTable>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+	<ui:define name="css">
+		<h:outputStylesheet name="css/awesome-bootstrap-checkbox.css" />
+	</ui:define>
+</ui:composition>

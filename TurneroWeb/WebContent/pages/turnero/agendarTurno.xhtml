@@ -1,0 +1,228 @@
+<ui:composition template="/WEB-INF/templateLTE.xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:jsf="http://xmlns.jcp.org/jsf"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough" xmlns:o="http://omnifaces.org/ui">
+	<ui:define name="idleMonitor"></ui:define>
+	<ui:define name="content">
+		<p:importConstants type="utilities.ErrorTypeConstant" var="errorTypeConstant" />
+		<f:metadata>
+			<f:viewAction action="#{ticketBean.initializeDataByUser('G')}"></f:viewAction>
+		</f:metadata>
+		<div class="row">
+			<div class="col-md-12">
+				<h:form id="form" styleClass="form-horizontal">
+					<p:growl id="growl" />
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="panel panel-default" jsf:id="panel">
+								<div class="panel-heading">Agenda</div>
+								<div class="panel-body">
+									<div class="form-group">
+										<label class="col-sm-2 control-label">Servicio primario</label>
+										<div class="col-sm-4">
+											<h:selectOneMenu id="area-select" label="Servicio primario" value="#{ticketBean.ticketService}"
+												styleClass="form-control #{component.valid ? '':'ui-state-error'}" required="true"
+												converter="omnifaces.SelectItemsConverter">
+												<f:selectItems value="#{ticketBean.serviceTypeByAreaMap.keySet().toArray()}" var="object"
+													itemLabel="#{object.label}" itemValue="#{object}" />
+												<p:ajax listener="#{ticketBean.showServiceTypeByArea()}" update="service-list growl" oncomplete="initPage()"
+													process="@this" partialSubmit="true"></p:ajax>
+											</h:selectOneMenu>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label">Servicio secundario</label>
+										<div class="col-sm-4">
+											<h:selectOneMenu id="service-list" label="Servicio secundario" value="#{ticketBean.serviceType}"
+												styleClass="form-control #{component.valid ? '':'ui-state-error'}" required="true"
+												converter="omnifaces.SelectItemsConverter">
+												<f:selectItem itemLabel="" itemValue="#{null}" />
+												<f:selectItems value="#{ticketBean.serviceTypeList}" var="object" itemLabel="#{object.label}"
+													itemValue="#{object}" />
+												<p:ajax listener="#{ticketBean.fetchInfoByServiceType()}" update="growl att-user-sel att-module-sel"
+													oncomplete="initPage()" process="@this"></p:ajax>
+											</h:selectOneMenu>
+										</div>
+									</div>
+									<ui:include src="/WEB-INF/cpt/findPerson.xhtml">
+										<ui:param name="jsOnComplete" value="initPage()" />
+										<ui:param name="patientTypePnlClass" value="hidden" />
+										<ui:param name="as400InputClass" value="" />
+										<ui:param name="userInputClass" value="hidden" />
+										<ui:param name="patientTypeUpdTrg" value="" />
+									</ui:include>
+									<div class="form-group">
+										<label class="col-sm-2 control-label">Usuario asignado</label>
+										<div class="col-sm-4">
+											<h:selectOneMenu id="att-user-sel" pt:data-label="doctorName" required="true" label="Usuario asignado"
+												value="#{ticketBean.systemUser}" styleClass="form-control #{component.valid ? '':'ui-state-error'}"
+												converter="omnifaces.SelectItemsConverter">
+												<f:selectItem itemLabel="" itemValue="#{null}" />
+												<f:selectItems value="#{ticketBean.systemUserByServiceTypeList}" var="object"
+													itemLabel="#{object.nombresCompletos}" itemValue="#{object}" />
+											</h:selectOneMenu>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label">Módulo</label>
+										<div class="col-sm-4">
+											<h:selectOneMenu id="att-module-sel" required="true" label="Módulo" value="#{ticketBean.attentionModule}"
+												styleClass="form-control #{component.valid ? '':'ui-state-error'}" pt:data-label="attentionModule"
+												pt:data-att-module-info="#{ticketBean.attentionModule.extraInfo}" converter="omnifaces.SelectItemsConverter">
+												<f:selectItem itemLabel="" itemValue="#{null}" />
+												<f:selectItems value="#{ticketBean.attentionModuleList}" var="object"
+													itemLabel="#{object.description} - #{object.label}" itemValue="#{object}" />
+												<p:ajax event="change" process="@this" partialSubmit="true" update="att-mdl-data growl"
+													oncomplete="initPage()"></p:ajax>
+											</h:selectOneMenu>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label"></label>
+										<div class="col-sm-4 text-center">
+											<p:commandLink id="add-appointment" action="#{ticketBean.addAppointment()}" process="@this"
+												partialSubmit="true" update="appointment-list-pnl" styleClass="" oncomplete="initPage()">
+												<i class="fa fa-plus"></i> Añadir
+											</p:commandLink>
+										</div>
+									</div>
+									<div jsf:id="appointment-list-pnl">
+										<ui:repeat id="appointment-list" var="obj" value="#{ticketBean.appointmentWrapperList}">
+											<div class="form-group">
+												<label class="col-sm-2 control-label">Fecha - Horario</label>
+												<div class="col-sm-2">
+													<h:inputText id="date" name="date" required="false" styleClass="form-control datepicker" label="Fecha"
+														value="#{obj.appointment}" pt:data-time="#{obj.id}" pt:autocomplete="off">
+														<f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+													</h:inputText>
+												</div>
+												<div class="col-sm-2">
+													<h:selectOneMenu value="#{obj.timeRange}" id="time-range-select" required="false"
+														styleClass="form-control #{component.valid ? '':'ui-state-error'}" label="Horario"
+														title="Horario - Agendado/Disponible/Total">
+														<f:selectItems value="#{obj.scheduleList}" var="object" itemValue="#{object[0]}"
+															itemLabel="#{object[0] += ' - ' += object[1] +='/'+= object[2] +='/'+= object[3]}"
+															itemDisabled="#{object[2] eq 0}" />
+													</h:selectOneMenu>
+												</div>
+												<p class="form-control-static">
+													<p:commandLink id="rmv-btn" action="#{ticketBean.removeAppointment(obj)}" process="@this"
+														partialSubmit="true" update=":form:appointment-list-pnl" oncomplete="initPage()">
+														<i class="fa fa-close"></i> Remover</p:commandLink>
+												</p>
+											</div>
+										</ui:repeat>
+									</div>
+									<p:remoteCommand id="load-times-by-date-rmt-cmd" name="findAvailableTicket" partialSubmit="true"
+										process="@this service-list appointment-list-pnl" update="growl service-list appointment-list-pnl"
+										oncomplete="initPage()" action="#{ticketBean.findAvailableTicket()}"></p:remoteCommand>
+									<div class="form-group" jsf:rendered="#{ticketBean.resultData.showErrorPanel}">
+										<div class="col-sm-offset-2 col-sm-4">
+											<div class="alert alert-danger">#{ticketBean.resultData.message}</div>
+											<table class="table"
+												jsf:rendered="#{ticketBean.resultData.errorType eq errorTypeConstant.AGD_COLISION_HORARIO}">
+												<thead>
+													<tr>
+														<td>Servicio</td>
+														<td>Horario</td>
+													</tr>
+												</thead>
+												<tbody>
+													<ui:repeat var="obj" value="#{ticketBean.resultData.resultList}">
+														<tr>
+															<td><div class="ellipsis" title="#{obj[0]}">#{obj[0]}</div></td>
+															<td><div class="ellipsis" title="#{obj[1]}">#{obj[1]}</div></td>
+														</tr>
+													</ui:repeat>
+												</tbody>
+											</table>
+											<table class="table"
+												jsf:rendered="#{ticketBean.resultData.errorType eq errorTypeConstant.AGD_CUPO_NO_DISPONIBLE}">
+												<thead>
+													<tr>
+														<td>Horario</td>
+													</tr>
+												</thead>
+												<tbody>
+													<ui:repeat var="obj" value="#{ticketBean.resultData.resultList}">
+														<tr>
+															<td><div class="ellipsis" title="#{obj}">#{obj}</div></td>
+														</tr>
+													</ui:repeat>
+												</tbody>
+											</table>
+										</div>
+									</div>
+									<div class="clearfix"></div>
+									<h:inputHidden id="dates" value="#{ticketBean.dates}" required="false" label="Horarios"></h:inputHidden>
+									<h:inputHidden id="times" value="#{ticketBean.times}" required="false" label="Rangos"></h:inputHidden>
+									<h:inputHidden id="att-mdl-data" value="#{ticketBean.attentionModule.extraInfo}" required="false"
+										pt:class="att-mdl-data" />
+								</div>
+								<div class="panel-footer">
+									<div class="pull-right">
+										<button type="button" class="btn btn-danger white-font" id="confirm"
+											onclick="window.location.href = window.location.href.replace('#','');">
+											<span class="fa fa-close"></span> Cancelar
+										</button>
+										<p:commandLink styleClass="btn btn-primary white-font" action="#{ticketBean.saveScheduledTicket()}"
+											process="@form" update="@form" id="save-btn" oncomplete="initPage()">
+											<span class="fa fa-check"></span> Guardar
+										</p:commandLink>
+									</div>
+									<div class="clearfix"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+	<ui:define name="css">
+		<h:outputStylesheet name="css/bootstrap-datepicker/bootstrap-datepicker3.min.css" />
+	</ui:define>
+	<ui:define name="js">
+		<h:outputScript name="js/bootstrap-datepicker/bootstrap-datepicker.min.js" />
+		<h:outputScript name="js/bootstrap-datepicker/bootstrap-datepicker.es.min.js" />
+		<script>
+			$(document).ready(function() {
+
+				initPage();
+
+			});
+
+			var selectedDates = [];
+
+			function initPage() {
+
+				var data = null;
+
+				try {
+
+					data = JSON.parse($('.att-mdl-data').val());
+
+					$(".datepicker").datepicker({
+						format : 'dd/mm/yyyy',
+						weekStart : 1,
+						language : 'es',
+						startDate : new Date(),
+						daysOfWeekDisabled : data.daysOfWeekDisabled,
+						autoclose : true
+					}).off('changeDate').on('changeDate', function(evt) {
+
+						findAvailableTicket([ {
+							name : 'id',
+							value : $(this).data('time')
+						} ]);
+
+					});
+
+				} catch (error) {
+
+				}
+
+			}
+		</script>
+	</ui:define>
+</ui:composition>

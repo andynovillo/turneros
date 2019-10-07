@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'text-security-disc';
+    src: url('#{resource['css:text-security/text-security-disc.eot']}');
+    src: url('#{resource['css:text-security/text-security-disc.eot']}') format('embedded-opentype'),
+        url('#{resource['css:text-security/text-security-disc.woff2']}') format('woff2'),
+        url('#{resource['css:text-security/text-security-disc.woff']}') format('woff'),
+        url('#{resource['css:text-security/text-security-disc.ttf']}') format('truetype'),
+        url('#{resource['css:text-security/text-security-disc.svg']}') format('svg');
+}

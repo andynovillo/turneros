@@ -1,0 +1,133 @@
+<ui:composition template="/WEB-INF/templateLTE.xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:jsf="http://xmlns.jcp.org/jsf"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	>
+	<ui:define name="idleMonitor"></ui:define>
+	<ui:define name="content">
+		<div class="row">
+			<div class="col-md-12">
+				<h:form id="form" styleClass="form-horizontal">
+					<p:defaultCommand id="dflt-cmd" target="search-btn"></p:defaultCommand>
+					<p:growl id="growl" showDetail="true" />
+					<div class="row margin-bottom">
+						<div class="col-md-6 col-md-offset-3"></div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<div class="panel panel-default">
+								<!-- Default panel contents -->
+								<div class="panel-heading">Agenda</div>
+								<div class="panel-body">
+									<div class="form-group">
+										<label class="col-sm-2 control-label">Usuario AS400</label>
+										<div class="col-sm-4">
+											<div class="input-group">
+												<input jsf:id="search-input" type="text"
+													class="form-control #{component.valid ? '':'ui-state-error'}"
+													jsf:required="true" jsf:label="Usuario AS400"
+													jsf:value="#{checkAppointmentBean.user}" /> <span
+													class="input-group-btn"> <a jsf:id="search-btn"
+													jsf:action="#{checkAppointmentBean.findInfoByUser()}"
+													class="btn btn-success"> <span
+														class="fa fa-fw fa-search" /> <p:ajax
+															process="search-input @this" update="@form"></p:ajax>
+												</a>
+												</span>
+											</div>
+										</div>
+									</div>
+									<div class="form-group"
+										jsf:rendered="#{not empty checkAppointmentBean.objectList}">
+										<label class="col-sm-2 control-label">Módulo</label>
+										<div class="col-sm-4">
+											<h:selectOneMenu id="att-module-sel" required="true"
+												label="Módulo"
+												value="#{checkAppointmentBean.attentionModule}"
+												styleClass="form-control #{component.valid ? '':'ui-state-error'}"
+												converter="omnifaces.SelectItemsConverter">
+												<f:selectItem itemLabel="" itemValue="#{null}" />
+												<f:selectItems
+													value="#{checkAppointmentBean.attentionModuleList}"
+													var="object"
+													itemLabel="#{object.label}"
+													itemValue="#{object}" />
+											</h:selectOneMenu>
+										</div>
+									</div>
+								</div>
+								<!-- Table -->
+								<div class="table-responsive"
+									jsf:rendered="#{not empty checkAppointmentBean.objectList}">
+									<table
+										class="table table-condensed table-striped table-bordered">
+										<thead>
+											<tr>
+												<td class="s-col">Llamar</td>
+												<ui:repeat id="col-model-list" var="col"
+													varStatus="columnIndex"
+													value="#{checkAppointmentBean.columnModelList}">
+													<td class="#{col.style}" jsf:rendered="#{col.rendered}">
+														<div class="ellipsis" title="#{col.header}">
+															<h:outputText value="#{col.header}" />
+														</div>
+													</td>
+												</ui:repeat>
+											</tr>
+										</thead>
+										<tbody>
+											<ui:repeat id="result-list" var="obj"
+												value="#{checkAppointmentBean.objectList}">
+												<tr>
+													<td class="s-col text-center"><p:commandLink id="call-btn"
+															rendered="#{obj[0]}" process="@this :form:att-module-sel"
+															update=":form:growl :form:att-module-sel"
+															styleClass="btn btn-xs btn-success"
+															action="#{checkAppointmentBean.callTicket(obj)}"
+															oncomplete="lockSubmit(this.source)">
+															<span class="fa fa-fw fa-phone"></span>
+														</p:commandLink></td>
+													<ui:repeat id="col-model-list" var="col"
+														varStatus="columnIndex"
+														value="#{checkAppointmentBean.columnModelList}">
+														<td class="#{col.style}" jsf:rendered="#{col.rendered}"><div
+																class="ellipsis" title="#{obj[columnIndex.index]}">
+																<h:outputText value="#{obj[columnIndex.index]}" />
+															</div></td>
+													</ui:repeat>
+												</tr>
+											</ui:repeat>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+	<ui:define name="js">
+		<script>
+			$(function() {
+				initPage();
+			});
+
+			function initPage() {
+			}
+
+			function lockSubmit(id) {
+
+				$(PrimeFaces.escapeClientId(id)).addClass('disabled');
+				setTimeout(function() {
+					$(PrimeFaces.escapeClientId(id)).removeClass('disabled');
+				}, 1000);
+
+			}
+		</script>
+	</ui:define>
+</ui:composition>

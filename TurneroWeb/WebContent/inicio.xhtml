@@ -1,0 +1,72 @@
+<ui:composition template="/WEB-INF/templateLTE.xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough" xmlns:jsf="http://xmlns.jcp.org/jsf">
+	<ui:define name="idleMonitor">
+	</ui:define>
+	<ui:define name="content">
+		<f:view transient="true">
+		</f:view>
+		<div class="login-box custom-login-box trigger-form" jsf:rendered="#{empty userInSession}">
+			<div class="login-logo hidden">
+				<b>HTMC</b>Intranet
+			</div>
+			<div class="login-box-body">
+				<p class="login-box-msg">Inicie sesión</p>
+				<h:form id="form" pt:autocomplete="off">
+					<p:outputPanel id="session-panel" styleClass="login navbar-custom-menu">
+						<div class="form-group has-feedback">
+							<p:inputText id="user-in" value="#{loginBean.user.codSystemUser}" required="true" styleClass="form-control"
+								label="Usuario" pt:autofocus="autofocus" pt:required="true" pt:autocomplete="off"></p:inputText>
+							<span class="fa fa-fw fa-user form-control-feedback"></span>
+						</div>
+						<div class="form-group has-feedback">
+							<p:inputText id="password-in" value="#{loginBean.user.pass}" required="true" label="Contraseña"
+								styleClass="form-control conceal" pt:required="true" pt:spellcheck="false" pt:autocomplete="off" />
+							<span class="fa fa-fw fa-key form-control-feedback"></span>
+						</div>
+					</p:outputPanel>
+					<div class="row">
+						<div class="col-xs-8">
+							<p:link id="forgot-password-btn" outcome="/intranet/cfg/resetearContrasena"
+								class="btn btn-default btn-block btn-flat trigger-cmd">
+									Olvidé mi contraseña <span class="fa fa-unlock"></span>
+							</p:link>
+						</div>
+						<!-- /.col -->
+						<div class="col-xs-4">
+							<p:commandLink id="log-in-btn" action="#{loginBean.logIn()}" onclick="if(!evaluatePanel('login')){return false;}"
+								ajax="false" process="session-panel" class="btn btn-primary btn-block btn-flat trigger-cmd">
+									Iniciar
+								<span class="fa fa-arrow-circle-right"></span>
+							</p:commandLink>
+						</div>
+						<!-- /.col -->
+					</div>
+				</h:form>
+			</div>
+			<!-- /.login-box-body -->
+		</div>
+	</ui:define>
+	<ui:define name="css">
+		<h:outputStylesheet name="css/text-security/text-security-disc.css"></h:outputStylesheet>
+		<style>
+.conceal {
+	font-family: 'text-security-disc', Helvetica, Arial, sans-serift;;
+}
+</style>
+	</ui:define>
+	<ui:define name="js">
+		<h:outputScript name="js/jquery-validator/1.16.0/jquery.validate.min.js" />
+		<h:outputScript name="js/jquery-validator/1.16.0/additional-methods.min.js" />
+		<h:outputScript name="js/jquery-validator/1.16.0/messages_es.min.js" />
+		<script>
+			$(function() {
+				initPage();
+			})
+			function initPage() {
+
+			}
+		</script>
+	</ui:define>
+</ui:composition>

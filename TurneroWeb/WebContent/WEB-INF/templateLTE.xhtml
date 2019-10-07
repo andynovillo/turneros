@@ -1,0 +1,191 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html lang="es" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui" xmlns:jsf="http://xmlns.jcp.org/jsf" xmlns:f="http://xmlns.jcp.org/jsf/core"
+	mozNoMarginBoxes="true">
+<h:head id="head">
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport" />
+	<meta name="description" content="HTMC" />
+	<meta name="author" content="BryanV" />
+	<title>HTMC</title>
+	<link rel="shortcut icon" href="#{resource['images/favicon.ico']}" type="image/x-icon" />
+</h:head>
+<h:body id="body" styleClass="skin-blue sidebar-collapse fixed">
+	<f:facet name="last">
+		<h:outputStylesheet name="css/bootstrap.css" />
+		<h:outputStylesheet name="css/AdminLTE.css" />
+		<h:outputStylesheet name="css/skin-blue.css" />
+		<h:outputStylesheet name="css/CustomAdminLTE.css" />
+		<h:outputStylesheet name="css/HTMC.css" />
+		<h:outputStylesheet name="css/color.css" />
+	</f:facet>
+	<div class="wrapper">
+		<!-- Main Header -->
+		<header class="main-header">
+			<!-- Logo -->
+			<a href="#{utilityBean.propertyContainer.getProperty('HOST')}" class="logo"> <!-- mini logo for sidebar mini 50x50 pixels -->
+				<span class="logo-mini">HTMC<b></b></span> <!-- logo for regular state and mobile devices --> <span class="logo-lg">HTMC<b></b>Intranet
+			</span>
+			</a>
+			<!-- Header Navbar -->
+			<nav class="navbar navbar-static-top" role="navigation">
+				<!-- Sidebar toggle button-->
+				<span jsf:rendered="#{not empty userInSession}"> <a href="#" class="sidebar-toggle" data-toggle="offcanvas"
+					role="button"> <span class="sr-only">Toggle navigation</span>
+				</a>
+				</span>
+				<!-- Navbar Right Menu -->
+				<h:form id="session-form" styleClass="form-inline">
+					<p:growl id="growl" />
+					<div class="navbar-custom-menu" jsf:rendered="#{not empty userInSession}">
+						<ul class="nav navbar-nav">
+							<li class="dropdown user user-menu">
+								<!-- Menu Toggle Button --> <a href="#" class="dropdown-toggle" data-toggle="dropdown"> <!-- hidden-xs hides the username on small devices so only the image appears. -->
+									#{userInSession.nombresCompletos}
+							</a>
+							</li>
+							<li><p:link id="change-password-link" outcome="/config/cambiarContrasena">
+									<i class="fa fa-unlock-alt"></i>
+								</p:link></li>
+							<li><h:commandLink id="logOut" action="#{loginBean.logOut()}" process="@this" global="false" ajax="false">
+									<i class="fa fa-sign-out"></i>
+								</h:commandLink></li>
+						</ul>
+					</div>
+				</h:form>
+			</nav>
+		</header>
+		<!-- Left side column. contains the logo and sidebar -->
+		<aside class="main-sidebar">
+			<!-- sidebar: style can be found in sidebar.less -->
+			<section class="sidebar">
+				<!-- Sidebar Menu -->
+				<div id="sidebar-menu-container" jsf:rendered="#{not empty userInSession}">
+					<ul class="sidebar-menu" id="ul-sb-ref-0">
+					</ul>
+				</div>
+				<!-- /.sidebar-menu -->
+			</section>
+			<!-- /.sidebar -->
+		</aside>
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- Content Header (Page header) -->
+			<section class="content-header">
+				<ui:insert name="heading">
+					<ui:include src="/WEB-INF/heading.xhtml"></ui:include>
+				</ui:insert>
+				<div class="text-center hidden-print">
+					<span class="glb-msg">#{applicationBean.stickyMsg}</span>
+				</div>
+			</section>
+			<!-- Main content -->
+			<section class="content">
+				<ui:insert name="content">
+				</ui:insert>
+			</section>
+			<!-- /.content -->
+		</div>
+		<!-- /.content-wrapper -->
+		<!-- Main Footer -->
+		<footer class="main-footer hidden-print">
+			<!-- To the right -->
+			<div class="pull-right hidden-xs">
+				Corazón de servicio <i class="fa fa-heart heart"></i>
+			</div>
+			<!-- Default to the left -->
+			IESS - HTMC - TIC
+		</footer>
+	</div>
+	<!-- ./wrapper -->
+	<p:ajaxStatus id="ajaxStatus" onstart="$('#ajax-status-dlg').modal('show');$('html, body').css('cursor', 'wait')"
+		onsuccess="$('#ajax-status-dlg').modal('hide');$('html, body').css('cursor', 'auto')"
+		onerror="$('#ajax-status-dlg').modal('hide');$('#error-status-dlg').modal('show');$('html, body').css('cursor', 'auto')" />
+	<div id="ajax-status-dlg" class="modal" data-backdrop="static" data-keyboard="false">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-body">
+					<div class="text-center">
+						<p:graphicImage id="loading-img" name="/images/loading.gif" />
+					</div>
+					<div class="text-center hidden">
+						<button type="button" class="btn btn-danger" onclick="PrimeFaces.ajax.Queue.abortAll();">
+							<span class="fa fa-close"></span> Cancelar
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="error-status-dlg" class="modal" data-backdrop="static" data-keyboard="false">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<div class="text-center">
+						<p>¡Ha ocurrido un incidente, lamentamos los inconvenientes!</p>
+						<div class="text-center">
+							<button class="btn btn-primary" type="button" onclick="$('#error-status-dlg').modal('hide');">Ok</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<ui:insert name="idleMonitor">
+		<p:idleMonitor id="monitor" timeout="#{session.maxInactiveInterval * 1000}" onidle="$('#idle-modal').modal('show')" />
+		<ui:param name="inactiveInterval" value="#{session.maxInactiveInterval / 60}" />
+		<div class="modal" id="idle-modal" data-backdrop="static" data-keyboard="false">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">¿Alguien ahí?</h4>
+					</div>
+					<div class="modal-body">
+						<div class="text-center">Inactividad por al menos #{utilityBean.toInteger(inactiveInterval)} minutos. Inicie
+							sesión nuevamente.</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary white-font" id="confirm"
+							onclick="window.location.href = window.location.href.replace('#','');">
+							<i class="fa fa-check fa-fw" /> Ok
+						</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal-dialog -->
+		</div>
+	</ui:insert>
+	<ui:insert name="css">
+	</ui:insert>
+	<!-- jQuery -->
+	<h:outputScript name="js/jquery.js" rendered="false" />
+	<!-- Bootstrap Core JavaScript -->
+	<h:outputScript name="js/bootstrap.js" />
+	<h:outputScript name="js/slimScroll/jquery.slimscroll.min.js" />
+	<h:outputScript name="js/app.js" />
+	<!-- Utilities -->
+	<h:outputScript name="js/utility.js" />
+	<script>
+	
+		$ = jQuery;
+		
+		var wrongBrowser = '#{strings["wrongBrowser"]}'; 		
+		var startup = '#{startup.time}';
+		var menuItems = new Object(#{menuInSession});
+		var contextPath  = '#{request.contextPath}';
+		var sessionCreated = '#{not empty userInSession}';
+		var pushIcon = '#{resource["images/logo-iess-xs.png"]}';
+		var adminLTE = true;
+
+	</script>
+	<ui:insert name="js">
+	</ui:insert>
+	<p:tooltip id="global-tooltip" widgetVar="global-tooltip" />
+	<p:growl id="globalGrowl" widgetVar="globalGrowl"></p:growl>
+	<f:websocket id="global-socket" channel="globalMsg" onmessage="showGlobalMsg" />
+</h:body>
+</html>

@@ -1,0 +1,197 @@
+<ui:composition template="/WEB-INF/templateLTE.xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:jsf="http://xmlns.jcp.org/jsf"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+	<ui:define name="content">
+		<div class="row">
+			<div class="col-lg-12">
+				<h:form id="form">
+					<p:growl id="growl" />
+					<div class="row margin-bottom"
+						jsf:rendered="#{not systemUserServiceTypeBean.objCombined}">
+						<div class="col-lg-6 margin-bottom">
+							<p:dataTable id="user-tbl" var="object"
+								styleClass="table-compacted"
+								value="#{systemUserServiceTypeBean.systemUserList}"
+								paginator="true" paginatorPosition="bottom"
+								paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+								widgetVar="user-tbl" rows="5"
+								emptyMessage="#{strings['emptyMessage']}" pageLinks="3"
+								selection="#{systemUserServiceTypeBean.systemUserSelectedList}"
+								rowKey="#{object.codSystemUser}" rowSelectMode="add">
+								<f:facet name="header">Usuarios <div
+										class="pull-right">
+										<p:commandButton id="load-opt-link" styleClass="simple-link"
+											action="#{systemUserServiceTypeBean.loadInfo()}"
+											process="@this user-tbl" update="@form"
+											value="Cargar información" icon="fa fa-exchange">
+										</p:commandButton>
+									</div>
+									<div class="clearfix"></div>
+								</f:facet>
+								<p:ajax event="filter" global="false" />
+								<p:ajax event="sort" global="false" />
+								<p:ajax event="page" global="false" />
+								<p:column selectionMode="multiple"
+									styleClass="xs-btn-col text-center" />
+								<p:column filterBy="#{object.codSystemUser}"
+									filterMatchMode="contains" headerText="Usuario"
+									sortBy="#{object.codSystemUser}">
+									#{object.codSystemUser}
+								</p:column>
+								<p:column filterBy="#{object.nombresCompletos}"
+									filterMatchMode="contains" headerText="Nombres">
+									#{object.nombresCompletos}
+								</p:column>
+							</p:dataTable>
+						</div>
+						<div class="col-lg-6">
+							<p:dataTable id="service-tbl" var="object"
+								styleClass="table-compacted"
+								value="#{systemUserServiceTypeBean.serviceTypeList}"
+								paginator="true" paginatorPosition="bottom"
+								paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+								widgetVar="service-tbl" rows="5"
+								emptyMessage="#{strings['emptyMessage']}" pageLinks="3"
+								selection="#{systemUserServiceTypeBean.serviceTypeSelectedList}"
+								rowKey="#{object.serviceTypePk}" rowSelectMode="add">
+								<f:facet name="header">Servicios <div
+										class="pull-right">
+										<p:commandButton id="combine-opt-link"
+											styleClass="simple-link"
+											action="#{systemUserServiceTypeBean.combineInfo()}"
+											process="@this :form:user-tbl service-tbl" update="@form"
+											value="Combinar información" icon="fa fa-refresh">
+										</p:commandButton>
+									</div>
+									<div class="clearfix"></div>
+								</f:facet>
+								<p:ajax event="filter" global="false" />
+								<p:ajax event="sort" global="false" />
+								<p:ajax event="page" global="false" />
+								<p:column selectionMode="multiple"
+									styleClass="xs-btn-col text-center" />
+								<p:column filterBy="#{object.ticketServiceFk.label}"
+									filterMatchMode="contains" headerText="Serv. Primario"
+									sortBy="#{object.ticketServiceFk.label}">
+									#{object.ticketServiceFk.label}
+								</p:column>
+								<p:column filterBy="#{object.label}" filterMatchMode="contains"
+									headerText="Serv. Secundario" sortBy="#{object.label}">
+									#{object.label}
+								</p:column>
+							</p:dataTable>
+						</div>
+					</div>
+					<div class="row margin-bottom">
+						<div class="col-lg-12">
+							<p:dataTable id="user-service-tbl" var="object"
+								styleClass="table-compacted"
+								value="#{systemUserServiceTypeBean.systemUserServiceTypeSelectedList}"
+								paginator="true" paginatorPosition="bottom"
+								paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+								widgetVar="user-service-tbl" rows="5"
+								emptyMessage="#{strings['emptyMessage']}" pageLinks="3">
+								<f:facet name="header">Usuario - Servicio </f:facet>
+								<p:ajax event="filter" global="false" skipChildren="false" />
+								<p:ajax event="sort" global="false" skipChildren="false" />
+								<p:ajax event="page" global="false" skipChildren="false" />
+								<p:column id="user-col" headerText="Usuario" styleClass="r-col"
+									filterBy="#{object.systemUser.codSystemUser}"
+									filterMatchMode="contains"
+									sortBy="#{object.systemUser.codSystemUser}">
+									<div class="ellipsis">
+										<h:outputText value="#{object.systemUser.codSystemUser}" />
+									</div>
+									<h:inputHidden id="dirty-val" value="#{object.dirty}"
+										pt:class="dirty-val"></h:inputHidden>
+								</p:column>
+								<p:column id="full-names-col" headerText="Nombres completos"
+									styleClass="m-col"
+									filterBy="#{object.systemUser.nombresCompletos}"
+									filterMatchMode="contains">
+									<div class="ellipsis">
+										<h:outputText value="#{object.systemUser.nombresCompletos}" />
+									</div>
+								</p:column>
+								<p:column id="service-col" headerText="Servicio"
+									styleClass="l-col"
+									filterBy="#{object.serviceType.ticketServiceFk.label} - #{object.serviceType.label}"
+									filterMatchMode="contains"
+									sortBy="#{object.serviceType.ticketServiceFk.label} - #{object.serviceType.label}">
+									<div class="ellipsis">
+										<h:outputText
+											value="#{object.serviceType.ticketServiceFk.label} - #{object.serviceType.label}" />
+									</div>
+								</p:column>
+								<p:column id="can-generate-col" headerText="Puede generar"
+									styleClass="text-center n-col" filterBy="#{object.canGenerate}">
+									<f:facet name="filter">
+										<h:selectOneMenu id="can-gen-sts-slct"
+											onchange="PF('user-service-tbl').filter()">
+											<f:selectItem itemLabel="Seleccione el estado"
+												itemValue="#{null}" noSelectionOption="true" />
+											<f:selectItem itemLabel="Activo" itemValue="true" />
+											<f:selectItem itemLabel="No activo" itemValue="false" />
+										</h:selectOneMenu>
+									</f:facet>
+									<p:selectBooleanCheckbox id="can-call-chk"
+										value="#{object.canGenerate}" onchange="setDirtyObj(this);" />
+								</p:column>
+								<p:column id="can-call-col" headerText="Puede llamar"
+									styleClass="text-center n-col" filterBy="#{object.canCall}">
+									<f:facet name="filter">
+										<h:selectOneMenu id="can-call-sts-slct"
+											onchange="PF('user-service-tbl').filter()">
+											<f:selectItem itemLabel="Seleccione el estado"
+												itemValue="#{null}" noSelectionOption="true" />
+											<f:selectItem itemLabel="Activo" itemValue="true" />
+											<f:selectItem itemLabel="No activo" itemValue="false" />
+										</h:selectOneMenu>
+									</f:facet>
+									<p:selectBooleanCheckbox id="can-generate-chk"
+										value="#{object.canCall}" onchange="setDirtyObj(this);" />
+								</p:column>
+								<p:column id="status-col" headerText="Estado"
+									styleClass="text-center n-col" filterBy="#{object.tableStatus}">
+									<f:facet name="filter">
+										<h:selectOneMenu id="sts-slct"
+											onchange="PF('user-service-tbl').filter()">
+											<f:selectItem itemLabel="Seleccione el estado"
+												itemValue="#{null}" noSelectionOption="true" />
+											<f:selectItem itemLabel="Activo" itemValue="true" />
+											<f:selectItem itemLabel="No activo" itemValue="false" />
+										</h:selectOneMenu>
+									</f:facet>
+									<p:selectBooleanCheckbox id="status-chk"
+										value="#{object.tableStatus}" onchange="setDirtyObj(this);" />
+								</p:column>
+							</p:dataTable>
+						</div>
+					</div>
+					<div class="text-center margin-bottom">
+						<p:commandButton value="Cancelar" id="reset-btn" process="@this"
+							update="@form" action="#{systemUserServiceTypeBean.reset()}"
+							icon="fa fa-close" />
+						<p:commandButton value="Guardar" id="save-btn" process="@form"
+							update="@form" action="#{systemUserServiceTypeBean.save()}"
+							icon="fa fa-check" />
+					</div>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+	<ui:define name="js">
+		<script>
+			function setDirtyObj(obj) {
+
+				$(obj).closest('td').parent().find('.dirty-val').val(true);
+
+			}
+		</script>
+	</ui:define>
+</ui:composition>

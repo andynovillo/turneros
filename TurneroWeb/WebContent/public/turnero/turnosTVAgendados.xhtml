@@ -1,0 +1,136 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
+<f:metadata>
+	<f:viewAction
+		action="#{ticketBean.findMonitorInfoScheduledTicketByServiceType()}" />
+</f:metadata>
+<h:head id="head">
+	<title>HTMC</title>
+	<link rel="shortcut icon" href="#{resource['images/favicon.ico']}"
+		type="image/x-icon" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+</h:head>
+<h:body id="body">
+	<f:facet name="last">
+		<h:outputStylesheet name="css/color.css" />
+	</f:facet>
+	<f:view transient="false">
+		<h:form id="form">
+			<p:dataTable id="tbl" var="object" value="#{ticketBean.objectList}"
+				emptyMessage="" rowStyleClass="#{object[3]}">
+				<p:column id="time-col" headerText="" styleClass="text-center"
+					style="width: 15%">
+					<h:outputText value="#{object[0]}" />
+				</p:column>
+				<p:column id="patient-col" headerText="" style="width: 70%">
+					<div class="ellipsis">
+						<h:outputText value="#{object[1]}" />
+					</div>
+				</p:column>
+				<p:column id="att-module-col" headerText="" styleClass="text-center"
+					style="width: 15%">
+					<h:outputText value="#{object[2]}" />
+				</p:column>
+			</p:dataTable>
+		</h:form>
+	</f:view>
+	<script>
+		function testService() {
+
+			var link = location.protocol + '//' + location.hostname
+					+ (location.port ? ':' + location.port : '')
+					+ location.pathname;
+
+			$.ajax({
+				type : 'HEAD',
+				url : link,
+				success : function() {
+					//location.reload();
+					window.location.href = window.location.href.replace('#','');
+				},
+				error : function() {
+					setTimeout(function() {
+						testService();
+					}, 5000);
+				}
+			});
+
+		}
+		function pageScroll() {
+
+			//<![CDATA[					
+
+			var scrollTop = (document.documentElement && document.documentElement.scrollTop)
+					|| document.body.scrollTop;
+
+			var scrollHeight = (document.documentElement && document.documentElement.scrollHeight)
+					|| document.body.scrollHeight;
+
+			//]]>		
+
+			var scrolledToBottom = Math.ceil(scrollTop + window.innerHeight) >= Math
+					.round(scrollHeight);
+
+			if (scrolledToBottom) {
+
+				setTimeout(function() {
+
+					testService();
+
+				}, 5000);
+
+			} else {
+
+				window.scrollBy(0, 10);
+				setTimeout(pageScroll, 500);
+
+			}
+
+		}
+
+		$(document)
+				.ready(
+						function() {
+
+							var css = '#{ticketBean.htmlStyle}', head = document.head
+									|| document.getElementsByTagName('head')[0], style = document
+									.createElement('style');
+
+							style.type = 'text/css';
+
+							if (style.styleSheet) {
+								style.styleSheet.cssText = css;
+							} else {
+								style.appendChild(document.createTextNode(css));
+							}
+
+							head.appendChild(style);
+
+							setTimeout(function() {
+								pageScroll();
+							}, 5000);
+
+						});
+
+		$(window).on('load', function(){
+			setTimeout(function() {
+				$('html, body').scrollTop(0);
+			}, 10);
+		});	
+		
+	</script>
+	<style>
+html {
+	font-size: #{ticketBean.fontSize};
+}
+body {
+	overflow: hidden;
+}
+</style>
+</h:body>
+</html>

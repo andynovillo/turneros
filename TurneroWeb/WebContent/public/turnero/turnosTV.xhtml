@@ -1,0 +1,441 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+<h:head id="head">
+	<title>HTMC</title>
+	<link rel="shortcut icon" href="#{resource['images/favicon.ico']}" type="image/x-icon" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<style>
+html, body {
+	overflow: hidden;
+	margin: 0px;
+	width: 100%;
+	height: 100%;
+}
+
+#container {
+	height: 100vh;
+}
+
+#ticket-panel {
+	position: relative;
+	font-size: 1em;
+}
+
+/*
+Hidden layout
+*/
+#left, #right {
+	display: none;
+}
+
+/*
+Default layout
+*/
+#left {
+	width: 50%;
+	height: 100%;
+	float: left;
+}
+
+#right {
+	width: 50%;
+	height: 100%;
+	float: right;
+}
+
+#bg {
+	position: fixed;
+	top: -50%;
+	left: -50%;
+	width: 200%;
+	height: 200%;
+	z-index: -1;
+}
+
+#bg img {
+	position: absolute;
+	top: 0;
+	left: 25%;
+	right: 0;
+	bottom: 0;
+	margin: auto;
+	max-width: 40%;
+	max-height: 40%;
+	opacity: 0.25;
+}
+
+/*
+Only ticket layout
+*/
+#left.only-ticket {
+	display: none;
+}
+
+#right.only-ticket {
+	width: 100%;
+	height: 100%;
+	float: right;
+}
+
+#bg.only-ticket {
+	position: fixed;
+	top: -50%;
+	left: -50%;
+	width: 200%;
+	height: 200%;
+	z-index: -1;
+}
+
+#bg.only-ticket img {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: auto;
+	max-width: 40%;
+	max-height: 40%;
+	opacity: 0.25;
+}
+
+/*
+Only video layout
+*/
+#left.only-video {
+	width: 100%;
+	height: 100%;
+	float: left;
+}
+
+#right.only-video {
+	display: none;
+}
+
+#bg.only-video {
+	display: none;
+}
+
+#bg.only-video img {
+	display: none;
+}
+</style>
+</h:head>
+<h:body id="body">	
+	<div id="container">
+		<div id="left">
+			<video width="100%" height="100%" id="videoPlayer" autoplay="autoplay" controls="controls" />
+		</div>
+		<div id="right">
+			<h:outputStylesheet name="css/animations.css" />
+			<audio id="bellSound">
+				<source src="#{resource['sounds:doorbell.mp3']}" type="audio/mp3" />
+			</audio>
+			<div id="ticket-panel">
+				<div id="bg">
+					<img src="#{resource['images/logo_iess.png']}" />
+				</div>
+				<f:view transient="false">
+					<h:form id="form">
+						<p:dataTable id="tbl" var="object" rows="10" value="#{ticketBean.calledTicketListByArea}" emptyMessage=""
+							styleClass="front-pnl">
+							<p:column id="ticket-col" headerText="TURNO" style="width: 70%">
+								<div class="ellipsis">#{object[0]}</div>
+							</p:column>
+							<p:column id="module-col" headerText="MÓDULO" style="width: 30%">					
+									#{object[1]}
+							</p:column>
+						</p:dataTable>
+						<p:remoteCommand id="rmt-cmd" name="updateTicketTblRmtCmd" update="@form" process="@this" partialSubmit="true"
+							action="#{ticketBean.initializeDataByArea()}" oncomplete="playSound()" />
+						<h:inputHidden id="font-size" value="#{ticketBean.fontSize}" pt:class="font-size"></h:inputHidden>
+						<h:inputHidden id="video-list" value="#{ticketBean.videoList}" pt:class="video-list"></h:inputHidden>
+						<h:inputHidden id="video-enabled" value="#{ticketBean.videoEnabled}" pt:class="video-enabled"></h:inputHidden>
+						<h:inputHidden id="ticket-enabled" value="#{ticketBean.ticketEnabled}" pt:class="ticket-enabled"></h:inputHidden>
+					</h:form>
+				</f:view>
+				<script>
+					$ = jQuery;
+
+					$(function() {
+
+						initPage();
+						initVideo();
+						testService();
+						
+						$('div#container').click(function() {
+							var tempLeft = $('div#left').html();
+							var tempRight = $('div#right').html();
+							$('div#left').html(tempRight);
+							$('div#right').html(tempLeft);
+						});
+
+					});
+
+					function testService() {
+
+						var link = location.protocol + '//' + location.hostname
+								+ (location.port ? ':' + location.port : '')
+								+ location.pathname;
+
+						$.ajax({
+							type : 'HEAD',
+							url : link,
+							success : function() {
+								updateTicketTblRmtCmd();
+								loadFontSize();
+								loadVideoInfo();
+								modifyPanels();
+								setTimeout(function() {
+									testService();
+								}, 2000);
+							},
+							error : function() {
+								setTimeout(function() {
+									testService();
+								}, 2000);
+							}
+						});
+
+					}
+
+					var tableBody;
+					var row;
+					var firstRow;
+					var audio;
+					var lastTickets = {};
+
+					function initPage() {
+
+						tableBody = $('#form\\:tbl_data');
+						row = tableBody.children('tr:first');
+						//var firstRow = "NO HAY TURNOS EN COLA";
+						firstRow = row.text();
+
+						audio = document.getElementById('bellSound');
+						audio.volume = 1;
+
+						lastTickets = {};
+
+						tableBody.children('tr').each(
+								function() {
+
+									var ticket = $(this).children('td:first')
+											.text().trim();
+									lastTickets[ticket] = $(this);
+
+								});
+
+					}
+
+					function playSound() {
+
+						var newTickets = {};
+
+						tableBody = $('#form\\:tbl_data');
+						tableBody.children('tr').each(
+								function() {
+
+									var ticket = $(this).children('td:first')
+											.text().trim();
+									newTickets[ticket] = $(this);
+
+								});
+
+						var last = [];
+						var next = [];
+
+						for ( var key in lastTickets) {
+							if (lastTickets.hasOwnProperty(key)) {
+								last.push(key);
+							}
+						}
+
+						for ( var key in newTickets) {
+							if (newTickets.hasOwnProperty(key)) {
+								next.push(key);
+							}
+						}
+
+						var flag = false;
+
+						var rows = [];
+
+						var bellCounter = 0;
+
+						//<![CDATA[
+
+						for ( var key in next) {
+
+							var found = $.inArray(next[key], last);
+							if (found == -1) {
+								$(newTickets[next[key]]).find('td')
+										.removeClass();
+								$(newTickets[next[key]]).find('td').addClass(
+										"shineAnimation");
+								if (bellCounter < 1) {
+									audio.load();
+									audio.play();
+									//responsiveVoice.speak(next[key]);
+								}
+								bellCounter++;
+							}
+
+						}
+
+						//]]>
+
+						lastTickets = newTickets;
+						//location.reload();
+						return false;
+
+					}
+
+					var videoArray = [];
+
+					var videoPlayer = null;
+
+					var videoIndex = 0;
+
+					function initVideo() {
+
+						videoPlayer = document.getElementById('videoPlayer');
+
+						videoPlayer.volume = 0.2;
+
+						loadVideoInfo();
+
+						videoPlayer.src = videoArray[0];
+
+						videoPlayer.onended = function() {
+
+							videoIndex++;
+
+							if (videoIndex >= videoArray.length) {
+								videoIndex = 0;
+							}
+
+							videoPlayer.src = videoArray[videoIndex];
+
+						}
+
+						videoPlayer.addEventListener('error', function(err) {
+
+							err.preventDefault();
+
+							setTimeout(function() {
+
+								videoPlayer.onended();
+
+							}, 2000);
+
+						});
+
+					}
+
+					function loadVideoInfo() {
+
+						videoArray = $('.video-list').val().split(',');
+
+					}
+
+					function loadFontSize() {
+
+						$('#ticket-panel').css({
+							fontSize : $('.font-size').val()
+						});
+
+					}
+
+					function modifyPanels() {
+
+						var layout = null;
+						var left = "1";
+						var right = "1";
+
+						if ($('.video-enabled').val() === 'true') {
+
+						} else {
+							left = "0";
+						}
+
+						if ($('.ticket-enabled').val() === 'true') {
+
+						} else {
+							right = "0";
+						}
+
+						layout = left + right;
+
+						switch (layout) {
+						case '11':
+							//Default layout
+							$('#left').removeClass();
+							$('#right').removeClass();
+							$('#bg').removeClass();
+							$('#left').show();
+							$('#right').show();
+							videoPlayer.play();
+							videoPlayer.volume = 0.2;
+							audio.volume = 1;
+							break;
+						case '01':
+							$('#left').hide();
+							$('#right').show();
+							$('#left').removeClass();
+							$('#bg').removeClass();
+							$('#left').addClass('only-ticket');
+							$('#right').addClass('only-ticket');
+							$('#bg').addClass('only-ticket');
+							videoPlayer.pause();
+							videoPlayer.volume = 0;
+							audio.volume = 1;
+							break;
+						case '10':
+							$('#right').hide();
+							$('#left').show();
+							$('#right').removeClass();
+							$('#bg').removeClass();
+							$('#right').addClass('only-video');
+							$('#left').addClass('only-video');
+							$('#bg').addClass('only-video');
+							audio.pause();
+							videoPlayer.play();
+							videoPlayer.volume = 1;
+							audio.volume = 0;
+							break;
+						case '00':
+							// Hidden layout
+							$('#left').hide();
+							$('#right').hide();
+							videoPlayer.pause();
+							audio.pause();
+							videoPlayer.volume = 0;
+							audio.volume = 0;
+							break;
+						default:
+							break;
+
+						}
+
+					}
+				</script>
+				<!-- <script src='//vws.responsivevoice.com/v/e?key=ukbc3p32'></script>
+		<script>
+			$(document)
+					.ready(
+							function() {
+								responsiveVoice
+										.setDefaultVoice('Spanish Latin American Female');
+							});
+		</script>
+		<button type="button"
+			onclick="responsiveVoice.setDefaultVoice('Spanish Latin American Female');responsiveVoice.speak('T');">test!</button>-->
+			</div>
+		</div>
+		<div style="clear: both;"></div>
+	</div>
+</h:body>
+</html>

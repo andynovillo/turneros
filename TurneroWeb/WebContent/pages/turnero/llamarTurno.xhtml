@@ -1,0 +1,179 @@
+<ui:composition template="/WEB-INF/templateLTE.xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:jsf="http://xmlns.jcp.org/jsf"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough" >
+	<ui:define name="idleMonitor"></ui:define>
+	<ui:define name="content">
+		<f:metadata>
+			<f:viewAction action="#{ticketBean.initializeDataByUser('L')}"></f:viewAction>
+		</f:metadata>
+		<h:form id="form" styleClass="form-horizontal">
+			<div class="row">
+				<div class="col-md-12">
+					<p:growl id="growl" />
+					<div jsf:id="top-panel">
+						<div class="col-md-4">
+							<p:outputPanel id="panel" styleClass="panel panel-default">
+								<div class="panel-heading">Llamar turno</div>
+								<div class="panel-body">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Servicio</label>
+										<div class="col-sm-8">
+											<h:selectOneMenu id="service-type-sel" required="false" label="Servicio" value="#{ticketBean.serviceType}"
+												styleClass="form-control #{component.valid ? '':'ui-state-error'}"
+												converter="omnifaces.SelectItemsConverter">
+												<p:ajax event="change" listener="#{ticketBean.defineModuleByServiceType()}" partialSubmit="true"
+													process="@this" update="panel" />
+												<f:selectItem itemLabel="Todos por prioridad" itemValue="#{null}" />
+												<f:selectItems itemLabel="#{object.ticketServiceFk.label} - #{object.label}" itemValue="#{object}"
+													value="#{ticketBean.serviceTypeByUserList}" var="object" itemDisabled="#{object.calledByPriority}" />
+											</h:selectOneMenu>
+										</div>
+									</div>
+									<div class="#{ticketBean.ticketPriority ne null ? 'form-group':'hidden'}" jsf:id="priority-pnl">
+										<div jsf:rendered="#{ticketBean.ticketPriority ne null}">
+											<label class="col-sm-4 control-label">Prioridad</label>
+											<div class="col-sm-8">
+												<div>
+													<p class="ellipsis form-control-static" title="#{ticketBean.ticketPriority.label}">
+														#{ticketBean.ticketPriority.label}</p>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Módulo</label>
+										<div class="col-sm-8">
+											<h:selectOneMenu id="att-module-sel" required="true" label="Módulo" value="#{ticketBean.attentionModule}"
+												styleClass="form-control #{component.valid ? '':'ui-state-error'}"
+												converter="omnifaces.SelectItemsConverter">
+												<f:selectItem itemLabel="" itemValue="#{null}" />
+												<f:selectItems value="#{ticketBean.attentionModuleList}" var="object"
+													itemLabel="#{object.description} - #{object.label}" itemValue="#{object}" />
+											</h:selectOneMenu>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-4 control-label"></label>
+										<div class="col-sm-8">
+											<p:commandLink id="call-generated-ticket" action="#{ticketBean.findNextTicket()}"
+												styleClass="btn btn-success form-control" process="form:top-panel" update="@form"
+												oncomplete="lockSubmit(this.source)" rendered="false">
+												<span class="fa fa-phone"></span> Llamar turno
+											</p:commandLink>
+											<h:commandLink id="call-generated-ticket-link" action="#{ticketBean.findNextTicket()}"
+												styleClass="btn btn-success form-control">
+												<f:ajax execute="form:top-panel" render="@form" />
+												<span class="fa fa-phone"></span> Llamar turno
+											</h:commandLink>
+										</div>
+										<div class="col-sm-offset-4 col-sm-8" jsf:rendered="#{ticketBean.ticket.ticketPk ne null}">
+											<p:commandLink id="recall-generated-ticket" action="#{ticketBean.reCallTicket()}"
+												styleClass="btn btn-warning form-control" process="form:top-panel" update="@form"
+												oncomplete="lockSubmit(this.source)" rendered="false">
+												<span class="fa fa-phone"></span> Volver a llamar turno
+											</p:commandLink>
+											<h:commandLink id="recall-generated-ticket-link" action="#{ticketBean.reCallTicket()}"
+												styleClass="btn btn-warning form-control">
+												<f:ajax execute="form:top-panel" render="@form" />
+												<span class="fa fa-phone"></span> Volver a llamar turno
+											</h:commandLink>
+										</div>
+										<div class="col-sm-offset-4 col-sm-8" jsf:rendered="#{ticketBean.ticket.ticketPk ne null}">
+											<p:commandLink id="end-generated-ticket" action="#{ticketBean.endTicket()}"
+												styleClass="btn btn-danger form-control" process="form:top-panel" update="@form"
+												oncomplete="lockSubmit(this.source)" rendered="false">
+												<span class="fa fa-close"></span> Finalizar turno
+											</p:commandLink>
+											<h:commandLink id="end-generated-ticket-link" action="#{ticketBean.endTicket()}"
+												styleClass="btn btn-danger form-control">
+												<f:ajax execute="form:top-panel" render="@form" />
+												<span class="fa fa-close"></span> Finalizar turno
+											</h:commandLink>
+										</div>
+									</div>
+									<div jsf:rendered="#{ticketBean.ticket.ticketPk ne null}">
+										<div class="form-group">
+											<label class="col-sm-4 control-label">Turno</label>
+											<div class="col-sm-8">
+												<p class="form-control-static ellipsis">
+													<h:outputText title="#{ticketBean.ticket.ticket}" value="#{ticketBean.ticket.ticket}" />
+												</p>
+											</div>
+										</div>
+										<div class="form-group">
+											<label class="col-sm-4 control-label">Estado</label>
+											<div class="col-sm-8">
+												<p:selectOneRadio id="tck-status" layout="responsive" columns="1" value="#{ticketBean.ticket.attended}">
+													<f:selectItem itemLabel="Atendido" itemValue="true" />
+													<f:selectItem itemLabel="Ausente" itemValue="false" />
+												</p:selectOneRadio>
+											</div>
+										</div>
+									</div>
+								</div>
+							</p:outputPanel>
+						</div>
+						<div class="col-md-4">
+							<h:link outcome="turnosEnEspera" target="_blank" styleClass="simple-link">
+								<div class="panel panel-default">
+									<div class="panel-heading">Turnos en espera</div>
+									<table class="table table-bordered table-condensed" jsf:id="waiting-ticket-tbl">
+										<tr jsf:rendered="#{empty ticketBean.waitingTicketList}">
+											<td colspan="2"><h:outputText value="#{strings['emptyMessage']}"></h:outputText></td>
+										</tr>
+										<ui:repeat id="ticket-list" var="object" value="#{ticketBean.waitingTicketList}">
+											<tr>
+												<td class="full-col"><div class="ellipsis" title="#{object[0]}">#{object[0]}</div></td>
+												<td class="s-col text-center"><span class="badge">#{object[1]}</span></td>
+											</tr>
+										</ui:repeat>
+									</table>
+								</div>
+							</h:link>
+						</div>
+						<div class="col-md-4">
+							<div class="panel panel-default">
+								<div class="panel-heading">Turnos llamados</div>
+								<table class="table table-bordered table-condensed" jsf:id="called-ticket-tbl">
+									<tr jsf:rendered="#{empty ticketBean.calledTicketListByService}">
+										<td colspan="2"><h:outputText value="#{strings['emptyMessage']}"></h:outputText></td>
+									</tr>
+									<ui:repeat id="called-ticket-list" var="object" value="#{ticketBean.calledTicketListByService}">
+										<tr>
+											<td class="full-col"><div class="ellipsis" title="#{object[0]}">#{object[0]}</div></td>
+											<td class="s-col text-center">#{object[1]}</td>
+										</tr>
+									</ui:repeat>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<p:poll id="poll" listener="#{ticketBean.initializeDataByUser('L')}" interval="#{ticketBean.updateInterval}"
+				process="@this" global="false" update="form:priority-pnl form:waiting-ticket-tbl form:called-ticket-tbl" />
+		</h:form>
+	</ui:define>
+	<ui:define name="js">
+		<script>
+			$(function() {
+				initPage();
+			});
+
+			function initPage() {
+			}
+
+			function lockSubmit(id) {
+
+				console.log(id);
+
+				$(PrimeFaces.escapeClientId(id)).addClass('disabled');
+				setTimeout(function() {
+					$(PrimeFaces.escapeClientId(id)).removeClass('disabled');
+				}, 1000);
+
+			}
+		</script>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,66 @@
+<ui:composition template="/WEB-INF/templateLTE.xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml" xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:jsf="http://xmlns.jcp.org/jsf">
+	<ui:define name="content">
+		<div class="row">
+			<div class="col-lg-12">
+				<h:form id="form" styleClass="form-horizontal">
+					<div jsf:rendered="#{not usuarioBean.dataChanged}"
+						class="alert alert-warning text-center" role="alert">
+						<strong>¡Atención!</strong> Estimado usuario, es necesario que
+						registre su correo principal y alterno.
+					</div>
+					<div jsf:rendered="#{usuarioBean.dataChanged}"
+						class="alert alert-info text-center" role="alert">
+						<strong>¡Atención!</strong> Información registrada correctamente.
+					</div>
+					<p:growl id="growl" />
+					<p:outputPanel id="panel"
+						styleClass="panel panel-default margin-bottom"
+						rendered="#{not usuarioBean.dataChanged}">
+						<div class="panel-heading">Datos de usuario</div>
+						<div class="panel-body">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Correo principal</label>
+								<div class="col-sm-4">
+									<p:inputText id="mail-in" required="true"
+										label="Correo principal" styleClass="form-control"
+										value="#{usuarioBean.usuario.mail}"
+										validatorMessage="Correo: El valor no es válido">
+										<f:validateRegex
+											pattern="[\w\.-]*[a-zA-Z0-9_]@[\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]" />
+									</p:inputText>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Correo alterno</label>
+								<div class="col-sm-4">
+									<p:inputText id="other-mail-in" required="true"
+										label="Correo alterno" styleClass="form-control"
+										value="#{usuarioBean.usuario.otherMail}"
+										validatorMessage="Correo: El valor no es válido">
+										<f:validateRegex
+											pattern="[\w\.-]*[a-zA-Z0-9_]@[\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]" />
+									</p:inputText>
+								</div>
+							</div>
+						</div>
+						<div class="panel-footer">
+							<div class="pull-right">
+								<p:commandLink id="confirm-btn" process="@form" update="@form"
+									styleClass="btn btn-primary"
+									action="#{usuarioBean.updateUserInfo()}">
+									<i class="fa fa-check" /> Guardar
+								</p:commandLink>
+							</div>
+							<div class="clearfix"></div>
+						</div>
+					</p:outputPanel>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

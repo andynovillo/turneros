@@ -1,0 +1,68 @@
+/*
+Login
+*/
+.custom-login-box {
+	margin: 0 auto;
+}
+/*
+Font
+*/
+body {
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serift;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+	font-family: 'Helvetica Neue', sans-serif;
+}
+/*
+ * Misc: print
+ * -----------
+ */
+@media print {
+	.content-header {
+		display: block !important;
+		padding-top: 80px !important;
+		/*margin-bottom: -40px !important;*/
+	}
+}
+
+/*
+Side bar
+*/
+.sidebar-menu>li>a {
+	padding: 8px 5px 8px 15px;
+	display: block;
+}
+
+/*
+Tab content
+*/
+
+.nav-tabs-custom > .tab-content{
+	padding: 15px;
+}
+
+.nav-tabs-custom > .nav-tabs > li > a {
+	font-size: 18px;
+	font-weight: 500;
+}
+
+/*
+Bootstrap select
+*/
+.bootstrap-select > .btn.btn-default{
+	border-radius: 0;
+	background-color: white;	
+}
+.bootstrap-select .dropdown-menu ul li.disabled a span.text{
+	color: gray;
+}
+.bootstrap-select .dropdown-menu ul li.active a span.text{
+	color: white;
+}
+.bootstrap-select .dropdown-menu ul li.selected.active a span.text{
+	color: white;
+}
+.bootstrap-select .dropdown-menu ul li a span.text{
+	color: black;
+}

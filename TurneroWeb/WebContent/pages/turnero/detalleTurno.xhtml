@@ -1,0 +1,97 @@
+<ui:composition template="/WEB-INF/templateLTE.xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:jsf="http://xmlns.jcp.org/jsf">
+	<ui:define name="content">
+		<div class="row">
+			<div class="col-lg-12">
+				<h:form id="form" styleClass="form-horizontal">
+					<p:growl id="growl" />
+					<p:outputPanel id="panel" styleClass="panel panel-default margin-bottom">
+						<div class="panel-heading">Filtros de búsqueda</div>
+						<div class="panel-body">
+							<div class="form-group ">
+								<label class="col-sm-2 control-label">Desde</label>
+								<div class="col-sm-4">
+									<p:calendar id="start-date" value="#{ticketStatisticBean.startDate}" required="true" label="Fecha inicio"
+										locale="es" navigator="true" pattern="dd/MM/yyyy" readonlyInput="true">
+										<p:ajax event="dateSelect" listener="#{ticketStatisticBean.onDateSelect}" update="end-date" process="@this" />
+										<f:attribute name="month" value="1" />
+									</p:calendar>
+								</div>
+							</div>
+							<div class="form-group ">
+								<label class="col-sm-2 control-label">Hasta</label>
+								<div class="col-sm-4">
+									<p:calendar id="end-date" value="#{ticketStatisticBean.endDate}" required="true" label="Fecha fin" locale="es"
+										pattern="dd/MM/yyyy" navigator="true" mindate="#{ticketStatisticBean.startDate}"
+										maxdate="#{ticketStatisticBean.endDate}" readonlyInput="true">
+									</p:calendar>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Servicio primario</label>
+								<div class="col-sm-4">
+									<h:selectOneMenu id="primary-service-sel" required="true" label="Servicio primario"
+										value="#{ticketStatisticBean.ticketService}" styleClass="form-control"
+										converter="omnifaces.SelectItemsConverter">
+										<f:selectItem itemLabel="" itemValue="#{null}" noSelectionOption="true" />
+										<f:selectItems itemLabel="#{object.label}" itemValue="#{object}" value="#{ticketServiceBean.objectList}"
+											var="object" />
+									</h:selectOneMenu>
+								</div>
+							</div>
+						</div>
+						<div class="panel-footer">
+							<div class="pull-right">
+								<button type="button" class="btn btn-default"
+									onclick="window.location.href = window.location.href.replace('#','');">
+									<span class="fa fa-close"></span> Cancelar
+								</button>
+								<span> </span>
+								<p:commandLink id="save-btn" class="btn btn-primary" process="panel" update="@form"
+									action="#{ticketStatisticBean.findTicketDetailByTicketService()}">
+									<span class="fa fa-check"></span> Consultar 
+									</p:commandLink>
+							</div>
+							<div class="clearfix"></div>
+						</div>
+					</p:outputPanel>
+					<div jsf:id="tbl-pnl">
+						<p:dataTable id="tbl" var="record" rendered="#{not empty ticketStatisticBean.objectList}"
+							value="#{ticketStatisticBean.objectList}" paginator="true"
+							paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+							currentPageReportTemplate="Total: {totalRecords}" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+							widgetVar="tbl" rows="5" styleClass="margin-bottom hidden-print table-compacted no-border"
+							emptyMessage="#{strings['emptyMessage']}" pageLinks="3">
+							<f:facet name="header">
+								<span class="text-left">Detalle de turnos <span class="pull-right"><h:commandLink
+											id="xls-link-detail" action="#{ticketStatisticBean.exportTicketDetail()}" immediate="true" target="_blank"
+											styleClass="btn-xs btn btn-success white-text">
+											<span class="fa fa-download fa-fw"></span>
+										</h:commandLink></span></span>
+								<div class="clearfix" />
+							</f:facet>
+							<p:ajax event="filter" global="false" />
+							<p:ajax event="sort" global="false" />
+							<p:ajax event="page" global="false" />
+							<p:columns id="column" value="#{ticketStatisticBean.columnModelList}" var="column" columnIndexVar="columnIndex"
+								filterMatchMode="contains" filterBy="#{record[columnIndex]}" sortBy="#{record[columnIndex]}"
+								styleClass="#{column.style}" rendered="#{column.rendered}" exportable="#{column.exportable}">
+								<f:facet name="header">
+									<h:outputText value="#{column.header}" />
+								</f:facet>
+								<div class="ellipsis" title="#{record[columnIndex]}">
+									<h:outputText styleClass="#{column.paintable ? record[columnIndex]:''}"
+										value="#{column.paintable ? '&#160;&#160;&#160;&#160;':record[columnIndex]}" />
+								</div>
+							</p:columns>
+						</p:dataTable>
+					</div>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+	<ui:define name="js">
+		<h:outputScript name="js/calendar_es.js"></h:outputScript>
+	</ui:define>
+</ui:composition>

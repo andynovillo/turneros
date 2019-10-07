@@ -1,0 +1,51 @@
+<ui:composition template="/WEB-INF/templateLTE.xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:jsf="http://xmlns.jcp.org/jsf"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+	<ui:define name="content">
+		<f:metadata>
+			<f:viewAction
+				action="#{statisticTicketBean.findWaitingTicketListByUserService()}"></f:viewAction>
+		</f:metadata>
+		<h:form id="form" styleClass="form-horizontal">
+			<p:growl id="growl" />
+			<div class="text-center margin-bottom">
+				<button class="btn btn-success" type="button"
+					onclick="location.reload();">
+					<span class="fa fa-refresh"></span> Actualizar
+				</button>
+			</div>
+			<p:dataTable id="tbl" var="record" paginator="true"
+				value="#{statisticTicketBean.objectList}"
+				rendered="#{not empty statisticTicketBean.objectList}"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				currentPageReportTemplate="Total: {totalRecords}"
+				paginatorPosition="bottom" rowsPerPageTemplate="5,10,15,25,50"
+				rows="5" styleClass="margin-bottom"
+				emptyMessage="#{strings['emptyMessage']}" pageLinks="3">
+				<f:facet name="header">Turnos en espera</f:facet>
+				<p:ajax event="filter" global="false" />
+				<p:ajax event="sort" global="false" />
+				<p:ajax event="page" global="false" />
+				<p:columns id="column"
+					value="#{statisticTicketBean.columnModelList}" var="column"
+					columnIndexVar="columnIndex" filterMatchMode="contains"
+					filterBy="#{record[columnIndex]}" sortBy="#{record[columnIndex]}"
+					styleClass="#{column.style}">
+					<f:facet name="header">
+						<h:outputText value="#{column.header}" />
+					</f:facet>
+					<div class="ellipsis" title="#{record[columnIndex]}">
+						<h:outputText
+							styleClass="#{column.paintable ? record[columnIndex]:''}"
+							value="#{column.paintable ? '&#160;&#160;&#160;&#160;':record[columnIndex]}" />
+					</div>
+				</p:columns>
+			</p:dataTable>
+		</h:form>
+	</ui:define>
+</ui:composition>

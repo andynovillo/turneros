@@ -1,0 +1,113 @@
+<ui:composition template="/WEB-INF/templateLTE.xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+	<ui:define name="content">
+		<div class="row">
+			<div class="col-lg-12">
+				<h:form id="form">
+					<p:growl id="growl" />
+					<div class="col-lg-6 margin-bottom">
+						<p:dataTable id="user-tbl" var="object"
+							styleClass="table-compacted"
+							value="#{serviceTypeAttentionModuleBean.serviceTypeList}"
+							paginator="true" paginatorPosition="bottom"
+							paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+							widgetVar="user-tbl" rows="5"
+							emptyMessage="#{strings['emptyMessage']}" pageLinks="3">
+							<f:facet name="header">Servicios</f:facet>
+							<p:ajax event="filter" global="false" />
+							<p:ajax event="sort" global="false" />
+							<p:ajax event="page" global="false" />
+							<p:column filterBy="#{object.ticketServiceFk.label}"
+								filterMatchMode="contains" headerText="S. Primario">
+									#{object.ticketServiceFk.label}
+								</p:column>
+							<p:column filterBy="#{object.label}" filterMatchMode="contains"
+								headerText="S. Secundario">
+									#{object.label}
+								</p:column>
+							<p:column filterBy="#{object.abbreviation}"
+								filterMatchMode="contains" headerText="Abreviación">
+									#{object.abbreviation}
+								</p:column>
+							<p:column styleClass="btn-col text-center">
+								<p:commandButton
+									action="#{serviceTypeAttentionModuleBean.fetchAttentionModuleByServiceType(object)}"
+									process="@this" update="@form" icon="fa fa-arrow-right"
+									oncomplete="initPage()" />
+							</p:column>
+						</p:dataTable>
+					</div>
+					<div class="col-lg-6">
+						<p:outputPanel id="panel" styleClass="panel panel-default">
+							<div class="panel-heading">Módulos</div>
+							<div class="panel-body">
+								<div class="text-center margin-bottom">
+									Servicio<br />
+									<h:outputText
+										value="#{serviceTypeAttentionModuleBean.serviceType.label}"
+										rendered="#{serviceTypeAttentionModuleBean.objectSelected}" />
+									<br />
+								</div>
+								<div class="margin-bottom">
+									<p:selectCheckboxMenu id="attention-module-list"
+										rendered="false"
+										value="#{serviceTypeAttentionModuleBean.attentionModuleSelectedList}"
+										label="Escoja una o varias opciones" filter="true"
+										filterMatchMode="contains" styleClass="form-control"
+										converter="omnifaces.SelectItemsConverter">
+										<f:selectItems
+											value="#{serviceTypeAttentionModuleBean.attentionModuleList}"
+											var="object"
+											itemLabel="#{object.description eq null ? 'N/A':object.description} - #{object.label}" />
+									</p:selectCheckboxMenu>
+									<h:selectManyListbox id="attention-module-array"
+										styleClass="selectpicker form-control" pt:multiple="multiple"
+										pt:data-live-search="true" pt:data-actions-box="true"
+										pt:data-live-search-normalize="true"
+										pt:data-selected-text-format="count"
+										value="#{serviceTypeAttentionModuleBean.attentionModuleSelectedList}"
+										converter="omnifaces.SelectItemsConverter">
+										<f:selectItems
+											value="#{serviceTypeAttentionModuleBean.attentionModuleList}"
+											var="object"
+											itemLabel="#{object.description eq null ? 'N/A':object.description} - #{object.label}" />
+									</h:selectManyListbox>
+								</div>
+								<div class="text-center">
+									<p:commandButton value="Guardar" id="save-btn" process="@form"
+										update="@form"
+										action="#{serviceTypeAttentionModuleBean.save()}"
+										oncomplete="initPage()" icon="fa fa-check" />
+								</div>
+							</div>
+						</p:outputPanel>
+					</div>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+	<ui:define name="css">
+		<h:outputStylesheet name="css/bootstrap-select.min.css"
+			rendered="true" />
+	</ui:define>
+	<ui:define name="js">
+		<h:outputScript name="js/bootstrap-select.min.js" rendered="true" />
+		<h:outputScript name="js/bootstrap-select-es.min.js" rendered="true" />
+		<script>
+			$(function() {
+
+				initPage();
+
+			});
+
+			function initPage() {
+				$('.selectpicker').selectpicker();
+			}
+		</script>
+	</ui:define>
+</ui:composition>

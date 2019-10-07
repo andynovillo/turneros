@@ -1,0 +1,121 @@
+<ui:composition template="/WEB-INF/templateLTE.xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:jsf="http://xmlns.jcp.org/jsf"
+	
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+	<ui:define name="content">
+		<h:form id="form" styleClass="form-horizontal">
+			<p:defaultCommand id="dflt-cmd" target="submit-btn"></p:defaultCommand>
+			<p:outputPanel id="panel" styleClass="panel panel-default">
+				<div class="panel-heading">Filtro de búsqueda</div>
+				<div class="panel-body">
+					<div class="form-group ">
+						<label class="col-sm-2 control-label">Cédula</label>
+						<div class="col-sm-4">
+							<p:inputText id="code-in" label="Cédula" required="true"
+								value="#{ticketBean.patient.code}" styleClass="form-control"></p:inputText>
+						</div>
+					</div>
+				</div>
+				<div class="panel-footer">
+					<div class="col-sm-12 text-right">
+						<p:commandLink id="reset-btn" type="submit"
+							action="#{ticketBean.resetForm()}"
+							class="btn btn-danger" process="@this"
+							update="@form">
+							<span class="fa fa-close"></span>
+										Cancelar
+									</p:commandLink>
+						<span> </span>
+						<p:commandLink id="submit-btn" type="submit"
+							action="#{ticketBean.findScheduledTicketByPatient()}"
+							class="btn btn-primary" process="panel"
+							update="@form">
+							<span class="fa fa-check"></span> Consultar 
+									</p:commandLink>
+					</div>
+					<div class="clearfix"></div>
+				</div>
+			</p:outputPanel>
+			<div class="row">
+				<div class="col-md-12">
+					<p:growl id="growl" />
+					<p:dataTable id="tbl" var="record" scrollable="true"
+						styleClass="table-compacted margin-bottom"
+						rendered="#{not empty ticketBean.ticketList}"
+						value="#{ticketBean.ticketList}" paginator="true"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						currentPageReportTemplate="Total: {totalRecords}"
+						paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+						widgetVar="tbl" rows="5" pageLinks="3"
+						emptyMessage="#{strings['emptyMessage']}">
+						<f:facet name="header">
+							Turnos por paciente 
+						</f:facet>
+						<p:ajax event="filter" global="false" />
+						<p:ajax event="sort" global="false" />
+						<p:ajax event="page" global="false" />
+						<p:column id="ticket-date-time-col" headerText="Fecha y Hora"
+							styleClass="m-col" filterBy="#{record.schedulingStartDateTime}"
+							filterMatchMode="contains">
+							<h:outputText value="#{record.schedulingStartDateTime}">
+								<f:convertDateTime pattern="yyyy-MM-dd HH:mm"></f:convertDateTime>
+							</h:outputText>
+						</p:column>
+						<p:column id="patient-col" headerText="Paciente"
+							styleClass="full-col" filterBy="#{record.patientFk.patient}"
+							filterMatchMode="contains">
+							<div class="ellipsis" title="#{record.patientFk.patient}">#{record.patientFk.patient}</div>
+						</p:column>
+						<p:column id="attention-module-col" headerText="Módulo"
+							styleClass="s-col" filterBy="#{record.attentionModule}"
+							filterMatchMode="contains">
+							<div class="ellipsis" title="#{record.attentionModule}">#{record.attentionModule}</div>
+						</p:column>
+						<p:column id="attended-col" headerText="Atendido"
+							styleClass="n-col text-center" filterBy="#{record.attended}"
+							filterMatchMode="contains">
+							<f:facet name="filter">
+								<h:selectOneMenu id="attended-selector"
+									onchange="PF('tbl').filter()" styleClass="form-control">
+									<f:selectItem itemLabel="" itemValue="#{null}"
+										noSelectionOption="true" />
+									<f:selectItems value="#{utilityBean.yesNoList}" />
+								</h:selectOneMenu>
+							</f:facet>
+							<p:selectBooleanCheckbox id="attended-chk"
+								value="#{record.attended}">
+								<p:ajax process="@this" partialSubmit="true"
+									listener="#{ticketBean.updateAttendedStatus(record.ticketPk, record.attended)}" />
+							</p:selectBooleanCheckbox>
+						</p:column>
+						<p:column id="table-sts-col" headerText="Activo"
+							styleClass="n-col text-center" filterBy="#{record.tableStatus}"
+							filterMatchMode="contains">
+							<f:facet name="filter">
+								<h:selectOneMenu id="is-sent-selector"
+									onchange="PF('tbl').filter()" styleClass="form-control">
+									<f:selectItem itemLabel="" itemValue="#{null}"
+										noSelectionOption="true" />
+									<f:selectItems value="#{utilityBean.yesNoList}" />
+								</h:selectOneMenu>
+							</f:facet>
+							<p:selectBooleanCheckbox id="status-chk"
+								value="#{record.tableStatus}">
+								<p:ajax process="@this" partialSubmit="true"
+									listener="#{ticketBean.updateTableStatus(record.ticketPk, record.tableStatus)}" />
+							</p:selectBooleanCheckbox>
+						</p:column>
+					</p:dataTable>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+	<ui:define name="js">
+		<h:outputScript name="js/calendar_es.js"></h:outputScript>
+	</ui:define>
+</ui:composition>

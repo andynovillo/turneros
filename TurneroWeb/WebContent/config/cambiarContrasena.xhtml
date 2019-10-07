@@ -1,0 +1,162 @@
+<ui:composition template="/WEB-INF/templateLTE.xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml" xmlns:p="http://primefaces.org/ui" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:o="http://omnifaces.org/ui" xmlns:of="http://omnifaces.org/functions" xmlns:jsf="http://xmlns.jcp.org/jsf">
+	<ui:define name="content">
+		<p:importConstants type="utilities.Constant" var="constant"></p:importConstants>
+		<div class="row">
+			<div class="col-lg-12">
+				<h:form id="form" styleClass="form-horizontal">
+					<p:growl id="growl" rendered="false" />
+					<p:defaultCommand target="change-password-btn" id="dflt-cmd"></p:defaultCommand>
+					<div jsf:rendered="#{usuarioBean.dataChanged}" class="alert alert-info text-center" role="alert">
+						<strong>¡Atención!</strong> Contraseña cambiada correctamente.
+					</div>
+					<p:outputPanel id="panel" styleClass="box box-default margin-bottom" rendered="#{not usuarioBean.dataChanged}">
+						<div class="box-header with-border">
+							<h3 class="box-title">Cambio de contraseña</h3>
+						</div>
+						<div class="box-body">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Último cambio</label>
+								<div class="col-sm-4">
+									<p class="form-control-static">
+										<h:outputText value="#{userInSession.lastPasswordChangeDateTime}">
+											<f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+										</h:outputText>
+									</p>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Próximo cambio</label>
+								<div class="col-sm-4">
+									<p class="form-control-static">#{of:formatDate(of:addMonths(userInSession.lastPasswordChangeDateTime ne
+										null ? userInSession.lastPasswordChangeDateTime : now , userInSession.lastPasswordChangeDateTime ne null ?
+										constant.PASSWORD_EXPIRATION_TIME : 0), 'dd/MM/yyyy')}</p>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Contraseña actual</label>
+								<div class="col-sm-4">
+									<p:inputText id="actualPassword" required="true" requiredMessage="Debe ingresar su contraseña actual"
+										label="Contraseña actual" styleClass="form-control conceal" value="#{usuarioBean.actualPassword}"
+										pt:spellcheck="false" pt:autocomplete="off"></p:inputText>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Nueva contraseña</label>
+								<div class="col-sm-4">
+									<p:inputText id="newPassword" required="true" label="Nueva contraseña"
+										styleClass="form-control match-val new-val conceal" requiredMessage="Debe ingresar su nueva contraseña"
+										value="#{usuarioBean.newPassword}" pt:spellcheck="false" pt:autocomplete="off">
+									</p:inputText>
+									<div class="progress">
+										<div class="flat strength-helper progress-bar progress-bar-danger" role="progressbar" aria-valuenow="100"
+											aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+											<span class="strength-msg">Contraseña débil</span>
+										</div>
+									</div>
+									<em>Mínimo #{constant.PASSWORD_MIN_LENGTH} caracteres. Debe tener una mayúscula, una minúscula y un número
+										(no se permiten caracteres especiales). No puede usar como nueva contraseña la última asignada.</em>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Confirmar contraseña</label>
+								<div class="col-sm-4">
+									<p:inputText id="matchNewPassword" required="true" requiredMessage="Debe confirmar su nueva contraseña"
+										label="Nueva contraseña" styleClass="form-control match-val confirm-val conceal"
+										value="#{usuarioBean.newMatchPassword}" pt:spellcheck="false" pt:autocomplete="off"></p:inputText>
+									<div class="progress">
+										<div class="flat confirm-helper progress-bar progress-bar-danger" role="progressbar" aria-valuenow="100"
+											aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+											<span class="confirm-msg">Contraseñas no coinciden</span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label"></label>
+								<div class="col-sm-4">
+									<p:messages id="messages" showIcon="false" />
+								</div>
+							</div>
+						</div>
+						<div class="box-footer">
+							<div class="pull-right">
+								<p:commandLink id="change-password-btn" process="@form" update="@form" styleClass="btn btn-primary"
+									oncomplete="initPage()" action="#{usuarioBean.changePassword()}">
+									<i class="fa fa-check" /> Guardar
+								</p:commandLink>
+							</div>
+							<div class="clearfix"></div>
+						</div>
+					</p:outputPanel>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+	<ui:define name="css">
+		<h:outputStylesheet name="css/text-security/text-security-disc.css"></h:outputStylesheet>
+		<style>
+.conceal {
+	font-family: 'text-security-disc', Helvetica, Arial, sans-serift;;
+}
+</style>
+	</ui:define>
+	<ui:define name="js">
+		<script>
+			$(function() {
+				initPage();
+			});
+			var pattern = new RegExp(
+					"(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{6,}");
+			function initPage() {
+
+				//<![CDATA[
+				$('.new-val').on(
+						'keyup',
+						function() {
+							console.log($(this).val(), pattern.test($(this)
+									.val()));
+							if (pattern.test($(this).val())) {
+								$('.strength-msg').text('Contraseña fuerte');
+								$('.strength-helper').addClass(
+										'progress-bar-success');
+								$('.strength-helper').removeClass(
+										'progress-bar-danger');
+							} else {
+								$('.strength-msg').text('Contraseña débil');
+								$('.strength-helper').removeClass(
+										'progress-bar-success');
+								$('.strength-helper').addClass(
+										'progress-bar-danger');
+							}
+						});
+				$('.match-val')
+						.on(
+								'keyup',
+								function() {
+									if (($('.new-val').val() == $(
+											'.confirm-val').val())
+											&& $('.new-val').val() != ''
+											&& $('.confirm-val').val() != '') {
+										$('.confirm-msg').text(
+												'Contraseñas coinciden');
+										$('.confirm-helper').addClass(
+												'progress-bar-success');
+										$('.confirm-helper').removeClass(
+												'progress-bar-danger');
+									} else {
+										$('.confirm-msg').text(
+												'Contraseñas no coinciden');
+										$('.confirm-helper').removeClass(
+												'progress-bar-success');
+										$('.confirm-helper').addClass(
+												'progress-bar-danger');
+									}
+								});
+				//]]>
+			}
+		</script>
+	</ui:define>
+</ui:composition>

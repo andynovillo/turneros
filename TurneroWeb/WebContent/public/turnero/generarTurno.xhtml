@@ -1,0 +1,140 @@
+<ui:composition template="/WEB-INF/publicTemplateLTE.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui" xmlns:jsf="http://xmlns.jcp.org/jsf"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+	xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+	xmlns:o="http://omnifaces.org/ui"
+	>
+	<ui:define name="content">
+		<f:metadata>
+			<f:viewAction action="#{ticketBean.initializeDataByKiosk()}" />
+		</f:metadata>
+		<div class="row">
+			<div class="col-md-12">
+				<f:view transient="false">
+					<h:form id="form" styleClass="form-horizontal">
+						<p:growl id="growl" />
+						<div class="col-sm-12">
+							<div class="row margin-bottom">
+								<ui:repeat id="service-list" var="object"
+									value="#{ticketBean.serviceTypeList}">
+									<div
+										class="#{ticketBean.compactView ? 'col-sm-4':'col-md-3 col-xs-6'} ">
+										<p:commandLink id="service-type-btn"
+											action="#{ticketBean.printTicket(object)}" process="@this"
+											update="@form" styleClass="simple-link">
+											<div class="small-box bg-green">
+												<div class="inner text-center">
+													<h3>#{object.abbreviation}</h3>
+													<p></p>
+												</div>
+												<div class="icon">
+													<i class="fa fa-shopping-cart hidden"></i>
+												</div>
+												<span class="small-box-footer ellipsis"
+													title="#{object.label}"> #{object.label}</span>
+											</div>
+										</p:commandLink>
+									</div>
+								</ui:repeat>
+							</div>
+							<div class="row margin-bottom">
+								<div class="text-center">
+									<p:commandLink id="test-btn"
+										action="#{ticketBean.printTestTicket()}" process="@this"
+										update="@form" styleClass="btn btn-default btn-xs">
+										<span class="fa fa-fw fa-print"></span> Página de prueba
+									</p:commandLink>
+								</div>
+							</div>
+							<div id="printer-msg-dlg" class="modal" data-backdrop="static"
+								data-keyboard="false">
+								<div class="modal-dialog">
+									<div class="modal-content">
+										<div class="modal-body" jsf:id="printer-msg-dlg-bdy">
+											<div class="text-center">
+												<p class="text-justify">#{strings['ticketNotPrinted']}</p>
+												<h3 class="text-center">
+													<b>#{ticketBean.ticket.ticket}</b>
+												</h3>
+												<br />
+												<button class="btn btn-primary" type="button"
+													onclick="$('#printer-msg-dlg').modal('hide');">
+													<span class="fa fa-check"></span> Ok
+												</button>
+												<span> </span>
+												<p:commandLink styleClass="btn btn-warning" rendered="false"
+													action="#{ticketBean.sendTicket(ticketBean.data)}"
+													process="@this" update="@form" id="reprint-btn">
+													<span class="fa fa-refresh"></span> Volver a imprimir
+											</p:commandLink>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</h:form>
+				</f:view>
+			</div>
+		</div>
+	</ui:define>
+	<ui:define name="css">	
+	</ui:define>
+	<ui:define name="idleMonitor"></ui:define>
+	<ui:define name="js">
+		<script>
+			$(function() {
+				initPage();
+			});
+
+			window.oncontextmenu = function(event) {
+				event.preventDefault();
+				event.stopPropagation();
+				return false;
+			}
+			document.onselectstart = function() {
+				return false;
+			} // ie
+			document.onmousedown = function() {
+				//return false;
+			} // others
+			//<![CDATA[
+			var clicked = false, clickY;
+			
+			$(document).on({
+				'mousemove' : function(e) {
+					clicked && updateScrollPos(e);					
+				},
+				'mousedown' : function(e) {					
+					clicked = true;
+					clickY = e.pageY;					
+				},
+				'mouseup' : function(e) {
+					clicked = false;
+					$('html').css('cursor', 'auto');					
+				}
+			});
+
+			var updateScrollPos = function(e) {
+				//$('html').css('cursor', 'row-resize');
+				$(window).scrollTop($(window).scrollTop() + (clickY - e.pageY));
+				//$("html, body").animate({ scrollTop: $(window).scrollTop() }, $(window).scrollTop() + (clickY - e.pageY));
+			}
+			//]]>
+
+			function initPage() {
+
+				$('img, a').on('dragstart', function(event) {
+					event.preventDefault();
+				});
+				document.body.style.cursor = 'none';
+
+			}
+		</script>
+	</ui:define>
+</ui:composition>
