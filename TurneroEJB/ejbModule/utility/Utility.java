@@ -26,6 +26,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.IndexedColors;
 
+import entity.auth.Option;
 import javafx.scene.control.Cell;
 import sessionBean.auth.OptionFacadeLocal;
 import sessionBean.pub.ParameterFacadeLocal;
@@ -300,9 +301,9 @@ public final class Utility {
 
 	}
 
-	static String parameterJNDI = "java:global/AS400-Integration/AS400-IntegrationEJB/ParameterFacade!sessionBeans.ParameterFacadeLocal";
+	static String parameterJNDI = "java:global/Turnero/TurneroEJB/ParameterFacade!sessionBean.pub.ParameterFacadeLocal";
 
-	static String optionJNDI = "java:global/AS400-Integration/AS400-IntegrationEJB/OptionFacade!sessionBeans.OptionFacadeLocal";
+	static String optionJNDI = "java:global/Turnero/TurneroEJB/OptionFacade!sessionBean.auth.OptionFacadeLocal";
 
 	public static String getParamater(String parameter) {
 
