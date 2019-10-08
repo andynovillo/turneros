@@ -1,0 +1,95 @@
+<ui:composition template="/WEB-INF/templateLTE.xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:jsf="http://xmlns.jcp.org/jsf"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+	<ui:define name="content">
+		<div class="row">
+			<div class="col-lg-12">
+				<h:form id="form">
+					<p:growl id="growl" life="3000" showDetail="false" />
+					<div class="col-lg-6 margin-bottom">
+						<p:dataTable id="tablaRoles" var="record" styleClass="table-compacted" value="#{rolPermisoBean.roles}"
+							paginator="true" paginatorPosition="bottom" currentPageReportTemplate=" "
+							paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+							rowsPerPageTemplate="5,10,15" widgetVar="tablaRoles" rows="5" pageLinks="3"
+							emptyMessage="#{strings['emptyMessage']}">
+							<f:facet name="header">Roles</f:facet>
+							<p:ajax event="filter" global="false" />
+							<p:ajax event="sort" global="false" />
+							<p:ajax event="page" global="false" />
+							<p:column id="role-col" filterBy="#{record.role}" sortBy="#{record.role}" filterMatchMode="contains"
+								headerText="Rol">
+								<div class="ellipsis">
+									<h:outputText value="#{record.role}" />
+								</div>
+							</p:column>
+							<p:column id="btn-col" styleClass="btn-col text-center">
+								<p:commandButton id="btn-link" action="#{rolPermisoBean.buscarPermisos(record)}" update=":form:panel"
+									icon="fa fa-arrow-right" oncomplete="initPage()" />
+							</p:column>
+						</p:dataTable>
+					</div>
+					<div class="col-lg-6">
+						<p:outputPanel id="panel" styleClass="panel panel-default">
+							<div class="panel-heading">Permisos</div>
+							<div class="panel-body">
+								<div class="center margin-bottom">
+									Rol<br />
+									<h:outputText value="#{rolPermisoBean.rol.role}" rendered="#{rolPermisoBean.rolSelected}" />
+									<br /> <br /> Permisos
+								</div>
+								<!-- styleClass="permisosPanel" -->
+								<h:selectManyListbox id="option-array" styleClass="selectpicker form-control margin-bottom"
+									pt:multiple="multiple" pt:data-live-search="true" pt:data-actions-box="true"
+									pt:data-live-search-normalize="true" pt:data-selected-text-format="count"
+									value="#{rolPermisoBean.permisosSelected}" converter="omnifaces.SelectItemsConverter">
+									<f:selectItems value="#{rolPermisoBean.permisos}" var="object" itemLabel="#{object.option}"
+										itemValue="#{object}" />
+								</h:selectManyListbox>
+								<div class="scroll-pnl-y" jsf:rendered="false">
+									<p:selectManyCheckbox id="permisosSMCB" layout="grid" columns="1" value="#{rolPermisoBean.permisosSelected}"
+										converter="#{permisoBean}">
+										<f:selectItems value="#{rolPermisoBean.permisos}" var="object" itemLabel="#{object.option}"
+											itemValue="#{object}" />
+									</p:selectManyCheckbox>
+								</div>
+								<div class="margin-bottom" jsf:rendered="false">
+									<p:selectCheckboxMenu id="dependency-list" value="#{rolPermisoBean.permisosSelected}"
+										label="Escoja una o varias opciones" filter="true" filterMatchMode="contains" styleClass="form-control"
+										converter="omnifaces.SelectItemsConverter">
+										<f:selectItems value="#{rolPermisoBean.permisos}" var="object" itemLabel="#{object.option}"
+											itemValue="#{object}" />
+									</p:selectCheckboxMenu>
+								</div>
+								<div class="text-center margin-top">
+									<p:commandButton value="Guardar" id="save-btn" update="form" action="#{rolPermisoBean.guardar()}"
+										icon="fa fa-check" oncomplete="initPage()" />
+								</div>
+							</div>
+						</p:outputPanel>
+					</div>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+	<ui:define name="css">
+		<h:outputStylesheet name="css/bootstrap-select.min.css" rendered="true" />
+	</ui:define>
+	<ui:define name="js">
+		<h:outputScript name="js/bootstrap-select.min.js" rendered="true" />
+		<h:outputScript name="js/bootstrap-select-es.min.js" rendered="true" />
+		<script>
+			$(document).ready(function() {
+
+				$('.selectpicker').selectpicker();
+
+			});
+
+			function initPage() {
+
+				$('.selectpicker').selectpicker();
+
+			}
+		</script>
+	</ui:define>
+</ui:composition>

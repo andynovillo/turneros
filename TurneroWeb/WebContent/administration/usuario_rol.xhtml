@@ -1,0 +1,61 @@
+<ui:composition template="/WEB-INF/templateLTE.xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
+	<ui:define name="content">
+		<h:form id="form">
+			<p:growl id="growl" />
+			<div class="col-lg-6 margin-bottom">
+				<p:dataTable id="user-tbl" var="object" styleClass="table-compacted"
+					value="#{usuarioRolBean.systemUserList}" paginator="true"
+					paginatorPosition="bottom"
+					paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+					widgetVar="user-tbl" rows="5"
+					emptyMessage="#{strings['emptyMessage']}" pageLinks="3"
+					selection="#{usuarioRolBean.systemUserSelectedList}"
+					rowKey="#{object.codSystemUser}" rowSelectMode="add">
+					<f:facet name="header">Usuarios 
+							</f:facet>
+					<p:ajax event="filter" global="false" />
+					<p:ajax event="sort" global="false" />
+					<p:ajax event="page" global="false" />
+					<p:column selectionMode="multiple"
+						styleClass="xs-btn-col text-center" />
+					<p:column filterBy="#{object.codSystemUser}"
+						filterMatchMode="contains" headerText="Usuario"
+						sortBy="#{object.codSystemUser}">
+									#{object.codSystemUser}
+								</p:column>
+					<p:column filterBy="#{object.nombresCompletos}"
+						filterMatchMode="contains" headerText="Nombres">
+						<div class="ellipsis">#{object.nombresCompletos}</div>
+					</p:column>
+				</p:dataTable>
+			</div>
+			<div class="col-lg-6 margin-bottom">
+				<p:outputPanel id="panel" styleClass="panel panel-default">
+					<div class="panel-heading">Roles</div>
+					<div class="panel-body">
+						<p:tree id="rolesTree" value="#{usuarioRolBean.root}" var="node"
+							animate="true" selectionMode="checkbox"
+							selection="#{usuarioRolBean.selectedNodes}"
+							styleClass="panel-centered full-width">
+							<p:treeNode id="treeNode">
+								<h:outputText value="#{node}" />
+							</p:treeNode>
+						</p:tree>
+					</div>
+				</p:outputPanel>
+			</div>
+			<div class="text-center margin-bottom">
+				<p:commandButton value="Cancelar" id="reset-btn" process="@this"
+					update="@form" action="#{usuarioRolBean.reset()}"
+					icon="fa fa-close" />
+				<p:commandButton value="Guardar" id="save-btn" process="@form"
+					update="@form" action="#{usuarioRolBean.save()}" icon="fa fa-check" />
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

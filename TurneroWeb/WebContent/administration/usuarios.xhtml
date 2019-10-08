@@ -1,0 +1,274 @@
+<ui:composition template="/WEB-INF/templateLTE.xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:jsf="http://xmlns.jcp.org/jsf"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+	<ui:define name="content">
+		<f:metadata>
+			<f:viewAction action="#{usuarioBean.findDataForUsers()}" />
+		</f:metadata>
+		<div class="row">
+			<div class="col-lg-12">
+				<h:form id="form" styleClass="form-horizontal">
+					<p:growl id="growl" />
+					<p:outputPanel id="panel" styleClass="box box-default margin-bottom">
+						<div class="box-header with-border">Administración de usuarios</div>
+						<div class="box-body">
+							<p:outputPanel id="usuarioSelected" layout="block">
+								<div class="form-group">
+									<label class="col-sm-2 control-label">Usuario</label>
+									<div class="col-sm-4">
+										<p:inputText id="codSystemUserInput" label="Usuario" styleClass="form-control" pt:required="true"
+											value="#{usuarioBean.usuario.codSystemUser}" required="true" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">Nombres completos</label>
+									<div class="col-sm-4">
+										<p:inputText id="nombreInput" label="Nombres" styleClass="form-control"
+											value="#{usuarioBean.usuario.nombresCompletos}" required="true" pt:required="true" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">Correo principal</label>
+									<div class="col-sm-4">
+										<p:inputText id="mail-in" label="Correo principal" styleClass="form-control"
+											value="#{usuarioBean.usuario.mail}" validatorMessage="Correo principal: El valor no es válido">
+											<f:validateRegex pattern="[\w\.-]*[a-zA-Z0-9_]@[\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]" />
+										</p:inputText>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">Correo alterno</label>
+									<div class="col-sm-4">
+										<p:inputText id="other-mail-in" label="Correo alterno" styleClass="form-control"
+											value="#{usuarioBean.usuario.otherMail}" validatorMessage="Correo alterno: El valor no es válido">
+											<f:validateRegex pattern="[\w\.-]*[a-zA-Z0-9_]@[\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]" />
+										</p:inputText>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">Roles</label>
+									<div class="col-sm-4">
+										<button type="button" class="btn btn-default btn-flat" onclick="$('#roles-dlg').modal();">
+											<i class="fa fa-gear" />
+										</button>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">Dependencias</label>
+									<div class="col-sm-4">
+										<h:selectManyListbox id="diet-array" styleClass="selectpicker form-control diet-array" pt:multiple="multiple"
+											pt:data-live-search="true" pt:data-actions-box="true" pt:data-live-search-normalize="true"
+											pt:data-selected-text-format="count" value="#{usuarioBean.dependencySelectedList}"
+											converter="omnifaces.SelectItemsConverter">
+											<f:selectItems value="#{usuarioBean.dependencyList}" var="object" itemLabel="#{object.dependency}"
+												itemValue="#{object}" />
+										</h:selectManyListbox>
+									</div>
+									<button type="button" class="btn btn-primary btn-flat" onclick="viewDependencies();">
+										<span class="fa fa-search"></span>
+									</button>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">Estado</label>
+									<div class="col-sm-2">
+										<div class="checkbox checkbox-primary">
+											<input jsf:id="status-in" type="checkbox" onclick="$(this).val(this.checked ? true : false);"
+												value="#{usuarioBean.usuario.estado}" />
+											<h:outputLabel for="status-in">
+												<h:outputText value="&#160;" />
+											</h:outputLabel>
+										</div>
+									</div>
+								</div>
+							</p:outputPanel>
+						</div>
+						<div class="box-footer">
+							<div class="pull-right">
+								<button type="button" onclick="window.location.href = window.location.href.replace('#','');"
+									class="btn btn-danger">
+									<span class="fa fa-close"></span> Cancelar
+								</button>
+								<span> </span>
+								<p:commandLink id="manage-user-btn" process="panel :form:roles-dlg-pnl" update="@form" oncomplete="initPage()"
+									action="#{usuarioBean.addUser()}" styleClass="btn btn-primary" onstart="return validateForm()">
+									<span class="fa fa-check"></span> Confirmar
+								</p:commandLink>
+							</div>
+							<div class="clearfix"></div>
+						</div>
+					</p:outputPanel>
+					<p:dataTable id="tbl" var="record" styleClass="" value="#{usuarioBean.usuarios}" paginator="true"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						currentPageReportTemplate="Total: {totalRecords}" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+						widgetVar="tbl" rows="5" pageLinks="3" emptyMessage="#{strings['emptyMessage']}">
+						<f:facet name="header">Usuarios</f:facet>
+						<p:ajax event="filter" global="false" />
+						<p:ajax event="sort" global="false" />
+						<p:ajax event="page" global="false" />
+						<p:column id="edit-col" styleClass="xs-btn-col text-center">
+							<p:commandLink id="editButton" update=":form:panel :form:growl :form:roles-dlg-pnl"
+								action="#{usuarioBean.editRow(record)}" process="@this" styleClass="" oncomplete="initPage()">
+								<span class="fa fa-fw fa-pencil"></span>
+							</p:commandLink>
+						</p:column>
+						<p:column id="unlock-col" styleClass="xs-btn-col text-center">
+							<p:commandLink id="resetPassword" action="#{usuarioBean.resetPassword(record)}" process="@this"
+								update=":form:growl" onstart="return confirm('#{strings.areYouSure}')" oncomplete="initPage()" styleClass="">
+								<span class="fa fa-fw fa-unlock"></span>
+							</p:commandLink>
+						</p:column>
+						<p:column filterBy="#{record.idSystemUser}" sortBy="#{record.idSystemUser}" styleClass="s-col"
+							filterMatchMode="contains" headerText="Id.">
+							<h:outputText value="#{record.idSystemUser}" />
+						</p:column>
+						<p:column filterBy="#{record.codSystemUser}" sortBy="#{record.codSystemUser}" styleClass="m-col"
+							filterMatchMode="contains" headerText="Usuario">
+							<h:outputText id="codSystemUserOutput" value="#{record.codSystemUser}" />
+						</p:column>
+						<p:column filterBy="#{record.nombresCompletos}" sortBy="#{record.nombresCompletos}" styleClass="full-col"
+							headerText="Nombres completos" filterFunction="#{utilityBean.filterWildText}">
+							<div class="ellipsis" title="#{record.nombresCompletos}">
+								<h:outputText value="#{record.nombresCompletos}" />
+							</div>
+						</p:column>
+						<p:column id="mail-col" filterBy="#{record.mail}" styleClass="m-col" headerText="Correo principal">
+							<div class="ellipsis" title="#{record.mail}">
+								<h:outputText value="#{record.mail}" />
+							</div>
+						</p:column>
+						<p:column styleClass="m-col" headerText="Estado" filterBy="#{record.estado}" filterMatchMode="exact">
+							<f:facet name="filter">
+								<h:selectOneMenu id="sts-slct" onchange="PF('tbl').filter()" styleClass="form-control">
+									<f:selectItem itemLabel="" itemValue="#{null}" noSelectionOption="true" />
+									<f:selectItems value="#{utilityBean.boolStatusList}" />
+								</h:selectOneMenu>
+							</f:facet>
+							<h:outputText value="#{record.estado ? 'Activo':'Inactivo'}" />
+						</p:column>
+					</p:dataTable>
+					<div class="modal" tabindex="-1" role="dialog" id="roles-dlg">
+						<div class="modal-dialog" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+										<span aria-hidden="true">x</span>
+									</button>
+									<h4 class="modal-title">Roles</h4>
+								</div>
+								<div class="modal-body" jsf:id="roles-dlg-pnl">
+									<p:tree id="rolesTree" value="#{usuarioBean.root}" var="node" animate="true" selectionMode="checkbox"
+										selection="#{usuarioBean.selectedNodes}" styleClass="full-width">
+										<p:treeNode id="treeNode">
+											<div class="ellipsis">
+												<h:outputText value="#{node}" />
+											</div>
+										</p:treeNode>
+									</p:tree>
+								</div>
+								<div class="modal-footer hidden">
+									<button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal" tabindex="-1" role="dialog" id="dependencies-dlg">
+						<div class="modal-dialog" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+										<span aria-hidden="true">x</span>
+									</button>
+									<h4 class="modal-title">Dependencias</h4>
+								</div>
+								<div class="modal-body">
+									<div id="dependencies-bdy"></div>
+								</div>
+								<div class="modal-footer hidden">
+									<button type="button" class="btn btn-default" data-dismiss="modal">
+										<span class="fa fa-close" /> Cerrar
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+	<ui:define name="js">
+		<h:outputScript name="js/bootstrap-select.min.js" />
+		<h:outputScript name="js/bootstrap-select-es.min.js" />
+		<h:outputScript name="js/jquery-validator/1.16.0/jquery.validate.min.js" />
+		<h:outputScript name="js/jquery-validator/1.16.0/additional-methods.min.js" />
+		<h:outputScript name="js/jquery-validator/1.16.0/messages_es.min.js" />
+		<script>
+			$(function() {
+
+				initPage();
+
+			});
+
+			function initPage() {
+
+				$('.selectpicker').selectpicker();
+
+			}
+
+			function validateForm() {
+				var validator = $("#form")
+						.validate(
+								{
+									errorElement : "em",
+									errorPlacement : function(error, element) {
+										return true;
+									},
+									highlight : function(element, errorClass,
+											validClass) {
+										$(element).closest('.form-group')
+												.addClass("has-error")
+												.removeClass("has-success");
+									},
+									unhighlight : function(element, errorClass,
+											validClass) {
+										$(element).closest('.form-group')
+												.removeClass("has-error");
+									}
+								});
+				validator.form();
+				validator.focusInvalid();
+				return (validator.valid());
+			}
+
+			function viewDependencies() {
+
+				var options = $('.diet-array option:selected');
+				var selected = [];
+
+				$(options).each(function() {
+					selected.push($(this).text());
+					// or $(this).val() for 'id'
+				});
+
+				$("#dependencies-bdy").empty();
+
+				selected.forEach(function(item) {
+					var div = $('<div />', {
+						"class" : ""
+					});
+					var span = $('<span />', {
+						"text" : item
+					})
+					div.append(span).appendTo("#dependencies-bdy");
+				});
+
+				$('#dependencies-dlg').modal('show');
+
+			}
+		</script>
+	</ui:define>
+	<ui:define name="css">
+		<h:outputStylesheet name="css/awesome-bootstrap-checkbox.css" />
+		<h:outputStylesheet name="css/bootstrap-select.min.css" />
+	</ui:define>
+</ui:composition>

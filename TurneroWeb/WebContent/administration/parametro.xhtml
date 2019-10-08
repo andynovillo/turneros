@@ -1,0 +1,75 @@
+<ui:composition template="/WEB-INF/templateLTE.xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:jsf="http://xmlns.jcp.org/jsf">
+	<ui:define name="content">
+		<div class="row">
+			<div class="col-lg-12">
+				<h:form id="form" styleClass="form-horizontal">
+					<p:focus id="focus" context="panel" />
+					<p:growl id="growl" />
+					<p:outputPanel id="panel" styleClass="panel panel-default margin-bottom">
+						<div class="panel-heading">Administración de parámetros</div>
+						<div class="panel-body">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Parámetro</label>
+								<div class="col-sm-4">
+									<p:inputText id="param-in" label="Parámetro" styleClass="form-control" value="#{parameterBean.object.param}"
+										required="true" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Valor</label>
+								<div class="col-sm-4">
+									<p:inputText id="value-in" label="Valor" styleClass="form-control" value="#{parameterBean.object.value}"
+										required="true" />
+								</div>
+							</div>
+						</div>
+						<div class="panel-footer">
+							<div class="pull-right">
+								<a jsf:id="reset-btn" type="submit" jsf:action="#{parameterBean.resetForm()}" class="btn btn-danger"> <span
+									class="fa fa-close"></span> Cancelar<p:ajax process="@this" update="@form" />
+								</a><span> </span> <a jsf:id="save-btn" type="submit" jsf:action="#{parameterBean.saveObject()}"
+									class="btn btn-primary"> <span class="fa fa-check"></span> Guardar<p:ajax process="panel" update="@form" />
+								</a>
+							</div>
+							<div class="clearfix"></div>
+						</div>
+					</p:outputPanel>
+					<p:dataTable id="tbl" widgetVar="tbl" var="record" styleClass="table-compacted "
+						value="#{parameterBean.objectList}" paginator="true"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						currentPageReportTemplate="Total: {totalRecords}" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+						rows="5" pageLinks="3" emptyMessage="#{strings['emptyMessage']}">
+						<f:facet name="header">Parámetros</f:facet>
+						<p:ajax event="filter" global="false" />
+						<p:ajax event="sort" global="false" />
+						<p:ajax event="page" global="false" />
+						<p:column styleClass="xs-btn-col text-center">
+							<p:commandLink id="editButton" update=":form:panel :form:growl" action="#{parameterBean.selectObject(record)}"
+								process="@this" styleClass="">
+								<span class="fa fa-fw fa-pencil"></span>
+							</p:commandLink>
+						</p:column>
+						<p:column id="id-col" filterBy="#{record.resourcePk}" sortBy="#{record.resourcePk}" styleClass="s-col"
+							filterMatchMode="contains" headerText="Id.">
+							<h:outputText value="#{record.resourcePk}" />
+						</p:column>
+						<p:column id="param-col" filterBy="#{record.param}" sortBy="#{record.param}" styleClass="m-col"
+							filterMatchMode="contains" headerText="Parámetro">
+							<div class="ellipsis" title="#{record.param}">
+								<h:outputText value="#{record.param}" />
+							</div>
+						</p:column>
+						<p:column id="value-col" filterBy="#{record.value}" sortBy="#{record.value}" styleClass="full-col"
+							filterMatchMode="contains" headerText="Valor">
+							<div class="ellipsis" title="#{record.value}">
+								<h:outputText value="#{record.value}" />
+							</div>
+						</p:column>
+					</p:dataTable>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>
