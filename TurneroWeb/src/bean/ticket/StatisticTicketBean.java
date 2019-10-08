@@ -11,7 +11,8 @@ import org.omnifaces.cdi.ViewScoped;
 
 import entity.auth.SystemUser;
 import sessionBean.ticket.TicketFacadeLocal;
-import utilities.ColumnModel;
+import utility.ColumnModel;
+import utility.Utility;
 import web.utility.JSFUtility;
 
 /**

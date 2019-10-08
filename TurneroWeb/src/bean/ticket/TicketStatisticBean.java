@@ -17,8 +17,9 @@ import org.primefaces.event.SelectEvent;
 import entity.ticket.TicketService;
 import sessionBean.pub.ParameterFacadeLocal;
 import sessionBean.ticket.TicketFacadeLocal;
-import utilities.ColumnModel;
 import utilities.ListToExcel;
+import utility.ColumnModel;
+import utility.Utility;
 import web.utility.JSFUtility;
 
 /**

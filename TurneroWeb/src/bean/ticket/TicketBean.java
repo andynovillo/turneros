@@ -18,15 +18,12 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.omnifaces.cdi.ViewScoped;
 import org.primefaces.PrimeFaces;
 import org.primefaces.json.JSONArray;
 import org.primefaces.json.JSONException;
 import org.primefaces.json.JSONObject;
 
-import AS400.AS400Bean;
-import bean.generic.AS400GenericBean;
 import entity.auth.SystemUser;
 import entity.surgery.Patient;
 import entity.ticket.Area;
@@ -45,11 +42,9 @@ import sessionBean.ticket.ServiceTypeFacadeLocal;
 import sessionBean.ticket.SystemUserServiceTypeFacadeLocal;
 import sessionBean.ticket.TicketFacadeLocal;
 import sessionBean.ticket.TicketPriorityFacadeLocal;
-import utilities.AppointmentWrapper;
-import utilities.ColumnModel;
-import utilities.GenericPrinterSocket;
-import utilities.ResultData;
+import utility.GenericPrinterSocket;
 import utility.MethodName;
+import utility.ResultData;
 import utility.Utility;
 import web.utility.JSFUtility;
 import web.utility.JSFUtility.DialogType;
@@ -115,8 +110,6 @@ public class TicketBean implements Serializable {
 	private List<Object[]> calledTicketListByArea;
 	private List<Object[]> waitingTicketList;
 	private List<Object[]> objectList;
-	private List<ColumnModel> columnModelList;
-	private List<AppointmentWrapper> appointmentWrapperList;
 
 	/* Services */
 
@@ -134,10 +127,6 @@ public class TicketBean implements Serializable {
 	private AttentionModuleFacadeLocal attentionModuleFacadeLocal;
 	@Inject
 	private MonitorFacadeLocal monitorFacadeLocal;
-	@Inject
-	private AS400GenericBean as400GenericBean;
-	@Inject
-	private AS400Bean as400Bean;
 	@Inject
 	private TicketPriorityFacadeLocal ticketPriorityFacadeLocal;
 	@Inject
@@ -176,7 +165,6 @@ public class TicketBean implements Serializable {
 
 		serviceTypeByUserList = new ArrayList<>();
 		serviceTypeByAreaMap = new HashMap<>();
-		appointmentWrapperList = null;
 		ticketList = null;
 		objectList = null;
 
@@ -201,7 +189,6 @@ public class TicketBean implements Serializable {
 	public void resetForm() {
 
 		resetVariables();
-		as400GenericBean.resetVariables();
 		JSFUtility.reset("form");
 
 	}
@@ -747,135 +734,6 @@ public class TicketBean implements Serializable {
 
 	}
 
-	public void saveScheduledTicket() {
-
-		patient = as400GenericBean.getPatient();
-
-		if (!as400GenericBean.getPatientFound()) {
-			JSFUtility.addMessage(JSFUtility.PATIENT_DATA_NOT_FOUND, 2);
-			return;
-		}
-
-		if (appointmentWrapperList == null || appointmentWrapperList.isEmpty()) {
-			JSFUtility.addMessage("No se han asignado horarios", 2);
-			return;
-		}
-
-		HashMap<String, Object> data = new HashMap<>();
-
-		data.put("patient", patient);
-		data.put("attentionModule", attentionModule);
-		data.put("systemUser", JSFUtility.getUserInSession());
-		data.put("assignedUser", systemUser);
-		data.put("serviceType", serviceType);
-		data.put("address", JSFUtility.getIP());
-		data.put("appointmentWrapperList", appointmentWrapperList);
-
-		resultData = ticketFacadeLocal.saveScheduledTicket(data);
-
-		if (resultData.getStatus()) {
-			resetForm();
-			initializeDataByUser(action);
-			JSFUtility.addMessage(JSFUtility.SUCCESSFUL_TRANSACTION, 1);
-		} else {
-			JSFUtility.addMessage(JSFUtility.UNSUCCESSFUL_TRANSACTION, 2);
-		}
-
-	}
-
-	public void inactivateTicket(Integer id) {
-
-		try {
-
-			ticket = ticketFacadeLocal.find(id);
-			ticket.setTableStatus(false);
-			ticketFacadeLocal.edit(ticket);
-
-			JSFUtility.addMessage(JSFUtility.SUCCESSFUL_TRANSACTION, 1);
-
-		} catch (Exception exception) {
-			JSFUtility.addMessage(JSFUtility.UNSUCCESSFUL_TRANSACTION, 1);
-			Utility.printErrorMessage("Method: inactivateTicket!", exception);
-		}
-
-	}
-
-	public void updateTableStatus(Integer id, Boolean value) {
-
-		try {
-
-			ticket = ticketFacadeLocal.find(id);
-			ticket.setTableStatus(value);
-			ticketFacadeLocal.edit(ticket);
-
-		} catch (Exception exception) {
-			Utility.printErrorMessage("Method: updateTableStatus!", exception);
-		}
-
-	}
-
-	public void updateAttendedStatus(Integer id, Boolean value) {
-
-		try {
-
-			ticket = ticketFacadeLocal.find(id);
-			ticket.setAttended(value);
-			ticketFacadeLocal.edit(ticket);
-
-		} catch (Exception exception) {
-			Utility.printErrorMessage("Method: updateAttendedStatus!", exception);
-		}
-
-	}
-
-	public void findScheduledTicketByPatient() {
-
-		try {
-
-			ticketList = ticketFacadeLocal.findScheduledTicketByPatient(patient.getCode());
-
-			if (ticketList != null && !ticketList.isEmpty()) {
-
-				JSFUtility.addMessage(JSFUtility.DATA_FOUND, 1);
-
-			} else {
-
-				JSFUtility.addMessage(JSFUtility.DATA_NOT_FOUND, 2);
-
-			}
-
-		} catch (Exception exception) {
-
-			JSFUtility.addMessage(JSFUtility.SOMETHING_WENT_WRONG, 3);
-
-		}
-
-	}
-
-	public void findTicketTraceByCodeAndByTicketService() {
-
-		try {
-
-			Integer ticketServicePk = Integer.valueOf(Utility.getProperty("T-SP-EME"));
-
-			columnModelList = Utility.getColumnModelList("C-ER-TRZ");
-
-			objectList = ticketFacadeLocal.findTicketTraceByCodeAndByTicketService(code, ticketServicePk);
-
-			if (!CollectionUtils.isEmpty(objectList)) {
-				JSFUtility.info(JSFUtility.DATA_FOUND);
-			} else {
-				JSFUtility.warn(JSFUtility.DATA_NOT_FOUND);
-			}
-
-		} catch (Exception exception) {
-
-			JSFUtility.addMessage(JSFUtility.SOMETHING_WENT_WRONG, 3);
-
-		}
-
-	}
-
 	/*
 	 * Getters and setters
 	 */
@@ -1072,22 +930,6 @@ public class TicketBean implements Serializable {
 		this.objectList = objectList;
 	}
 
-	public List<ColumnModel> getColumnModelList() {
-		return columnModelList;
-	}
-
-	public void setColumnModelList(List<ColumnModel> columnModelList) {
-		this.columnModelList = columnModelList;
-	}
-
-	public AS400Bean getAs400Bean() {
-		return as400Bean;
-	}
-
-	public void setAs400Bean(AS400Bean as400Bean) {
-		this.as400Bean = as400Bean;
-	}
-
 	public String getFontSize() {
 		return fontSize;
 	}
@@ -1150,14 +992,6 @@ public class TicketBean implements Serializable {
 
 	public void setCompactView(Boolean compactView) {
 		this.compactView = compactView;
-	}
-
-	public AS400GenericBean getAs400GenericBean() {
-		return as400GenericBean;
-	}
-
-	public void setAs400GenericBean(AS400GenericBean as400GenericBean) {
-		this.as400GenericBean = as400GenericBean;
 	}
 
 	public String getHtmlStyle() {
@@ -1270,14 +1104,6 @@ public class TicketBean implements Serializable {
 
 	public void setSchedule(String schedule) {
 		this.schedule = schedule;
-	}
-
-	public List<AppointmentWrapper> getAppointmentWrapperList() {
-		return appointmentWrapperList;
-	}
-
-	public void setAppointmentWrapperList(List<AppointmentWrapper> appointmentWrapperList) {
-		this.appointmentWrapperList = appointmentWrapperList;
 	}
 
 	public String getAddress() {
