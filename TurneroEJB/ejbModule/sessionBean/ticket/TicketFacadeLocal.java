@@ -3,17 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package sessionBeans;
+package sessionBean.ticket;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.ejb.Local;
 
-import authEntities.SystemUser;
+import entity.auth.SystemUser;
 import entity.ticket.Ticket;
-import utilities.ResultData;
 
 /**
  *
@@ -50,44 +48,9 @@ public interface TicketFacadeLocal {
 
 	List<Object[]> findWaitingTicketListBySystemUserServiceType(Integer idSystemUser);
 
-	ResultData saveScheduledTicket(HashMap<String, Object> data);
-
-	List<Object[]> findScheduledTicketBySystemUser(Date startDate, Date endDate, Integer idSystemUser);
-
-	List<Object[]> findScheduledTicketByServiceType(Date startDate, Date endDate, Integer idSystemUser);
-
-	List<Ticket> findScheduledTicketByPatientAndService(String code, Integer userPk);
-
-	List<Object[]> findMonitorInfoScheduledTicketByServiceType(String ip);
-
-	List<Ticket> findScheduledTicketByPatient(String code);
-
 	Integer findNextTicketNumberByServiceType(Integer serviceTypePk);
 
 	List<Object[]> findAvailableTicket(Integer serviceTypePk, Integer idSystemUser, Date date, String evalType);
-
-	ResultData checkTicketAvailability(Integer service, Integer attentionModule, Date date, String schedule,
-			String evalType);
-
-	ResultData checkTicketCollision(String string);
-
-	ResultData checkTicketOrder(String orders);
-
-	/* Imagenología */
-
-	List<Object[]> findImgScheduledTicketByPatientAndService(String code, Integer userPk);
-
-	Object[] findImgScheduledTicket(Integer ticketPk, String code, Integer idSystemUser);
-
-	/* Fisiatría */
-
-	List<Object[]> findPhyScheduledTicketByPatientAndService(String code, Integer servicePk);
-
-	List<Object[]> findPhyScheduledTicketByServiceType(Date startDate, Date endDate, Integer servicePk);
-
-	List<Object[]> findPhyScheduledTicketBySystemUser(Date startDate, Date endDate, Integer idSystemUser);
-
-	List<Object[]> findPhyClosestAvailableApptInfo(String string);
 
 	SystemUser findTicketUser(Integer pk, String type);
 
@@ -99,21 +62,5 @@ public interface TicketFacadeLocal {
 	Ticket findLastCalledTicketNonFinishedByUser(Integer idSystemUser);
 
 	List<Object[]> findTicketDetailByTicketService(Date from, Date to, Integer ticketServicePk);
-
-	ResultData saveTicketHeader(HashMap<String, Object> data);
-
-	ResultData saveTicketDetail(HashMap<String, Object> data);
-
-	List<Object[]> findTicketHeaderByCode(String code);
-
-	/* Lab. Genética y Molecular */
-
-	List<Object[]> findLabGMScheduledTicketByPatientAndService(String code, Integer userPk);
-
-	Object[] findLabGMScheduledTicket(Integer ticketPk, String code, Integer idSystemUser);
-
-	/* Traza */
-
-	List<Object[]> findTicketTraceByCodeAndByTicketService(String code, Integer ticketServicePk);
 
 }
