@@ -12,10 +12,12 @@
 				<h:form id="form" styleClass="form-horizontal">
 					<p:growl id="growl" />
 					<div class="row">
-						<div class="col-sm-12">
-							<div class="panel panel-default">
-								<div class="panel-heading">Servicio primario</div>
-								<div class="panel-body">
+						<div class="col-sm-offset-4 col-sm-4">
+							<div class="box box-default">
+								<div class="box-header with-border">
+									<h3 class="box-title">Servicio primario</h3>
+								</div>
+								<div class="box-body">
 									<div>
 										<h:selectOneMenu id="area-select" label="Servicio primario" value="#{ticketBean.ticketService}"
 											styleClass="form-control" required="true" converter="omnifaces.SelectItemsConverter">
@@ -28,9 +30,11 @@
 							</div>
 						</div>
 						<div class="col-sm-12">
-							<div class="panel panel-default">
-								<div class="panel-heading">Servicio secundario</div>
-								<div class="panel-body">
+							<div class="box box-default">
+								<div class="box-header with-border">
+									<h3 class="box-title">Servicio secundario</h3>
+								</div>
+								<div class="box-body">
 									<div class="row">
 										<ui:repeat id="service-list" var="object" value="#{ticketBean.serviceTypeList}">
 											<div class="#{ticketBean.compactView ? 'col-sm-4':'col-md-3 col-xs-6'} ">

@@ -13,9 +13,11 @@
 					<p:growl id="growl" />
 					<div jsf:id="top-panel">
 						<div class="col-md-4">
-							<p:outputPanel id="panel" styleClass="panel panel-default">
-								<div class="panel-heading">Llamar turno</div>
-								<div class="panel-body">
+							<p:outputPanel id="panel" styleClass="box box-default">
+								<div class="box-header with-border">
+									<h3 class="box-title">Llamar turno</h3>
+								</div>
+								<div class="box-body">
 									<div class="form-group">
 										<label class="col-sm-4 control-label">Servicio</label>
 										<div class="col-sm-8">
@@ -116,8 +118,10 @@
 						</div>
 						<div class="col-md-4">
 							<h:link outcome="turnosEnEspera" target="_blank" styleClass="simple-link">
-								<div class="panel panel-default">
-									<div class="panel-heading">Turnos en espera</div>
+								<div class="box box-default">
+									<div class="box-header with-border">
+										<h3 class="box-title">Turnos en espera</h3>
+									</div>
 									<table class="table table-bordered table-condensed" jsf:id="waiting-ticket-tbl">
 										<tr jsf:rendered="#{empty ticketBean.waitingTicketList}">
 											<td colspan="2"><h:outputText value="#{strings['emptyMessage']}"></h:outputText></td>
@@ -133,8 +137,10 @@
 							</h:link>
 						</div>
 						<div class="col-md-4">
-							<div class="panel panel-default">
-								<div class="panel-heading">Turnos llamados</div>
+							<div class="box box-default">
+								<div class="box-header with-border">
+									<h3 class="box-title">Turnos llamados</h3>
+								</div>
 								<table class="table table-bordered table-condensed" jsf:id="called-ticket-tbl">
 									<tr jsf:rendered="#{empty ticketBean.calledTicketListByService}">
 										<td colspan="2"><h:outputText value="#{strings['emptyMessage']}"></h:outputText></td>
@@ -164,7 +170,7 @@
 			function initPage() {
 			}
 
-			function lockSubmit(id) {				
+			function lockSubmit(id) {
 
 				$(PrimeFaces.escapeClientId(id)).addClass('disabled');
 				setTimeout(function() {
