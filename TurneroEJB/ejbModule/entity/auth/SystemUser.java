@@ -48,14 +48,13 @@ import entity.ticket.TicketPriority;
 		@NamedQuery(name = "SystemUser.findByEstado", query = "SELECT s FROM SystemUser s WHERE s.estado = :estado"),
 		@NamedQuery(name = "SystemUser.findUser", query = "SELECT s FROM SystemUser s WHERE s.codSystemUser = :codSystemUser and s.pass = :pass"),
 		@NamedQuery(name = "SystemUser.findByNombresCompletos", query = "SELECT s FROM SystemUser s WHERE s.nombresCompletos = :nombresCompletos"),
-		@NamedQuery(name = "SystemUser.findUsersByProcess", query = "SELECT DISTINCT s FROM SystemUser s join fetch s.processInstanceSet p where p.processInstancePk = :processInstance"),
 		@NamedQuery(name = "SystemUser.findServiceTypeByUser", query = "SELECT DISTINCT s FROM SystemUser s left join fetch s.systemUserServiceTypeSet suts where s.idSystemUser = :systemUserPk and (suts.tableStatus = true or suts.tableStatus is null)"),
 		@NamedQuery(name = "SystemUser.findCanGenerateServiceTypeByUser", query = "SELECT DISTINCT s FROM SystemUser s left join fetch s.systemUserServiceTypeSet suts where s.idSystemUser = :systemUserPk and suts.tableStatus = true and suts.canGenerate = true"),
 		@NamedQuery(name = "SystemUser.findCanCallServiceTypeByUser", query = "SELECT DISTINCT s FROM SystemUser s left join fetch s.systemUserServiceTypeSet suts where s.idSystemUser = :systemUserPk and suts.tableStatus = true and suts.canCall = true"),
 		@NamedQuery(name = "SystemUser.findSystemUserByTicketServiceGroup", query = "select distinct su from SystemUser su join su.systemUserServiceTypeSet susts where susts.serviceType.ticketServiceFk.ticketServicePk in (SELECT distinct sts.serviceType.ticketServiceFk.ticketServicePk FROM SystemUser s join s.systemUserServiceTypeSet sts WHERE s.idSystemUser = :idSystemUser)"),
 		@NamedQuery(name = "SystemUser.fetchServiceTypePriorityByUser", query = "select distinct su from SystemUser su LEFT join fetch su.ticketPrioritySet tps where su.idSystemUser = :idSystemUser"),
 		@NamedQuery(name = "SystemUser.findByRolActivo", query = "SELECT s FROM SystemUser s WHERE s.rolActivo = :rolActivo"),
-		@NamedQuery(name = "SystemUser.fetchMngInfoForUser", query = "SELECT s FROM SystemUser s left join fetch s.dependencySet left join fetch s.roleSet WHERE s.idSystemUser = :idSystemUser"),
+		@NamedQuery(name = "SystemUser.fetchMngInfoForUser", query = "SELECT s FROM SystemUser s left join fetch s.roleSet WHERE s.idSystemUser = :idSystemUser"),
 		@NamedQuery(name = "SystemUser.findByToken", query = "SELECT s FROM SystemUser s WHERE s.tokenText = :tkn") })
 public class SystemUser implements Serializable {
 

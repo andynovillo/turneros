@@ -1,0 +1,54 @@
+<ui:composition template="/WEB-INF/templateLTE.xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:jsf="http://xmlns.jcp.org/jsf">
+	<ui:define name="content">
+		<div class="row">
+			<div class="col-lg-12">
+				<h:form id="form" styleClass="form-horizontal">
+					<p:defaultCommand id="dflt-cmd" target="confirm-btn"></p:defaultCommand>
+					<div jsf:rendered="#{not usuarioBean.dataChanged}"
+						class="alert alert-info text-center" role="alert">
+						<strong>¡Atención!</strong> Estimado usuario, para proceder con el
+						reseteo de su contraseña, digite su usuario y presione el botón
+						para enviar las indicaciones, las cuales llegarán a los correos
+						que esten asociados a la cuenta del usuario ingresado.
+					</div>
+					<div jsf:rendered="#{usuarioBean.dataChanged}"
+						class="alert alert-success text-center" role="alert">
+						<strong>¡Atención!</strong> Las indicaciones han llegado a sus
+						correos.
+					</div>
+					<p:growl id="growl" />
+					<p:outputPanel id="panel"
+						styleClass="panel panel-default margin-bottom">
+						<div class="panel-heading">Restablecer contraseña</div>
+						<div class="panel-body">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Usuario</label>
+								<div class="col-sm-4">
+									<p:inputText id="mail-in" required="true" label="Usuario"
+										styleClass="form-control"
+										value="#{usuarioBean.usuario.codSystemUser}"></p:inputText>
+								</div>
+							</div>
+						</div>
+						<div class="panel-footer">
+							<div class="pull-right">
+								<p:commandLink id="confirm-btn" process="@form" update="@form"
+									styleClass="btn btn-primary"
+									action="#{usuarioBean.resetPasswordByMail()}">
+									<i class="fa fa-check" /> Enviar indicaciones para restablecer contraseña
+								</p:commandLink>
+							</div>
+							<div class="clearfix"></div>
+						</div>
+					</p:outputPanel>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>
